@@ -161,6 +161,54 @@ is present, follow the MATERIAL CODE RECONCILIATION rules in that section:
   (not page anchors), so this back-tracked bracket is the only place the
   contract page survives — do not lose it.
 
+━━━ CONTRACT ↔ INVOICE COMPARISONS — DIRECTIONAL RULES (CRITICAL) ━━━
+Users often ask you to compare the material codes / fees in the CONTRACT against
+what was ACTUALLY billed on the SAP invoices (Snowflake) — e.g. "make a table of
+codes that are in the contract but not on the invoice, and vice versa". There are
+TWO directions and you MUST handle them DIFFERENTLY. Work out which direction(s)
+the user is asking about FIRST. If they ask for both ("and vice versa", "both
+ways"), produce TWO clearly-labelled sections, each following its own rules below.
+
+▶ DIRECTION A — CONTRACT → INVOICE (in the contract but MISSING from the invoice;
+  "potential misses", "under-billing", "what should have been billed but wasn't"):
+  • Answer STRICTLY and ONLY from the "BILLING RECONCILIATION — REVIEW REQUIRED"
+    data section further below. That section is the authoritative, human-reviewed
+    list of contract fees / codes potentially missing from the invoice. List its
+    Final Material Code and Tool-extracted Description (include Source Contract,
+    Page Number, and Contract Date when present) — usually as a Markdown table.
+  • DO NOT derive this answer from the "CONTRACT-ONLY" bucket of the MATERIAL CODE
+    RECONCILIATION block, from the EXTRACTED LINE ITEMS, or from your own ad-hoc
+    comparison — those are NOT reliable for this question, and the Review Required
+    section SUPERSEDES them. Never merge them in.
+  • If the "BILLING RECONCILIATION — REVIEW REQUIRED" section is ABSENT or empty
+    for the focused client(s), tell the user the Billing Recon output isn't
+    available for this client, so you cannot give the authoritative
+    missing-from-invoice list — do NOT fall back to guessing from raw
+    reconciliation or extracted line items.
+  • ALWAYS end a Direction-A answer with this disclaimer, verbatim, on its own
+    line (reproduce it as the single line below — do not re-wrap or re-indent it):
+    "_These are potential misses in the invoices to the best of my knowledge. A biller should verify these manually. If gaps are found, use the **Report** button to provide feedback._"
+
+▶ DIRECTION B — INVOICE → CONTRACT (on the invoice but NOT in the contract;
+  "extra billing", "over-billing", "billed but not contracted / not in the contract"):
+  • You do NOT yet have a reliable capability for this direction. The VERY FIRST
+    line of your reply MUST be this warning, verbatim (the single line below,
+    before any table or prose — do not re-wrap or re-indent it):
+    "⚠️ **Note:** I don't currently have a reliable capability to compare from invoice → contract (codes billed but not found in the contract). The comparison below is best-effort from the available data and may **not be 100% accurate** — please verify manually."
+  • THEN still attempt a best-effort comparison: take the SAP invoice material
+    codes (from the SAP INVOICE DATA section) and check each against the contract
+    material codes shown in [square brackets] in the EXTRACTED LINE ITEMS section
+    (these are the VALIDATED material codes from the Material Validation output
+    when it has run, otherwise the Material Code Matching output). Present the
+    invoice codes you cannot find in that contract data as a table, explicitly
+    labelled best-effort / unverified.
+  • Never present Direction-B results with the same confidence as Direction-A, and
+    never imply this comparison is authoritative.
+
+If the user asks for BOTH directions in one question, lead the WHOLE response with
+the Direction-B warning above, then give the Direction-A table (ending with its
+disclaimer) and the Direction-B table as separate, clearly-labelled sections.
+
 ━━━ FISERV SAP BILLING REFERENCE ━━━
 {kb_context}
 
@@ -177,6 +225,8 @@ CLIENT: {client_name}
 {extraction_context}
 
 {invoice_context}
+
+{recon_context}
 
 {cpi_context}
 
@@ -200,6 +250,7 @@ class ChatEngine:
         master_contract_context: str = "",
         product_hierarchy_context: str = "",
         invoice_context: str = "",
+        recon_context: str = "",
     ) -> str:
         return _SYSTEM_TEMPLATE.format(
             client_name=client_name,
@@ -216,6 +267,13 @@ class ChatEngine:
             # invoice facts.
             invoice_context=invoice_context
                                                   or "(SAP invoice data not consulted for this question — it is fetched only for invoice / billing / SAP questions. Do not state invoice amounts or billed material codes here.)",
+            # Billing Recon "Review Required" sheet — the authoritative
+            # contract→invoice "potentially missing from invoice" list. When not
+            # attached, tell the model NOT to fabricate a Direction-A answer.
+            # Note the neutral wording: "not attached for this question" ≠ "does
+            # not exist" (the block is gated, so a file may exist but be unfetched).
+            recon_context=recon_context
+                                                  or "(No BILLING RECONCILIATION — REVIEW REQUIRED data was attached for this question. If the user asks which contract codes/fees are missing from the invoice (the CONTRACT → INVOICE direction) and no 'BILLING RECONCILIATION — REVIEW REQUIRED' section appears above, do NOT guess from raw reconciliation or extracted line items. Tell them you don't have the Billing Recon 'Review Required' data loaded for this question, and ask them to re-ask it as an explicit contract-vs-invoice comparison (the data loads on those questions when a Billing Recon output exists for the client).)",
             cpi_context=cpi_context               or "(no CPI data)",
             clauses_context=clauses_context       or "(no clause-level data — run the clause extractors)",
         )

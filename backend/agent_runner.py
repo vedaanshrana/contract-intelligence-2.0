@@ -712,6 +712,303 @@ def find_cited_invoices(message_text: str) -> list[dict]:
     return found
 
 
+# ── Billing Recon "Review Required" (contract → invoice misses) ─────────────────
+# The Billing Recon scripts produce a "<CLIENT>_recon_output.xlsx" workbook whose
+# "Review Required" sheet is the authoritative, human-reviewed list of contract
+# fees / material codes that are potentially MISSING FROM THE INVOICE — i.e. the
+# CONTRACT → INVOICE direction. The chatbot must answer that direction strictly
+# from this sheet (see chat_engine._SYSTEM_TEMPLATE), because the live
+# reconciliation's CONTRACT-ONLY bucket is unreliable for it. Read straight off
+# disk (no Snowflake), so it works even off the VDI.
+#
+# These workbooks live in TWO places, both searched:
+#   1. The client's own INPUT folder (a manually-placed local copy, e.g. the DNA
+#      pair) — any *recon*.xlsx there is unambiguously that client's.
+#   2. The canonical "<BASE_DIR>/Recon Outputs/<Core>/<NAME>_recon_output.xlsx"
+#      tree the Billing Recon scripts write to. PORTICO clients live ONLY here.
+# The file name normalizes the client name differently than the folder (e.g.
+# folder "YNB" → "YUKON_NATIONAL_BANK_recon_output.xlsx"), so we (1) scan the
+# client's own folder, and (2) match the Recon Outputs file by normalized name.
+
+RECON_OUTPUTS_DIR = config.BASE_DIR / "Recon Outputs"
+
+_RECON_REVIEW_SHEET = "Review Required"
+# The material-code header varies by Core: DNA recon files use "Final Material
+# Code"; PORTICO files use "Original Material Code". Try them in order, then
+# fall back to the matched invoice-side code.
+_RECON_CODE_COLS = ("Final Material Code", "Original Material Code",
+                    "Matched Invoice Code")
+# Cap so a pathological recon file can't blow the prompt budget. The real sheets
+# are ~40–110 rows; if we ever truncate we say so (no silent caps).
+_RECON_MAX_ROWS = 300
+_RECON_NORM_RE = re.compile(r"[^a-z0-9]+")
+
+
+def _recon_norm(s) -> str:
+    """Strict client-name normalization for matching: lowercase, drop everything
+    that isn't a-z/0-9 (so 'ZELLCO FEDERAL CREDIT UNION' == 'ZELLCO_FEDERAL_
+    CREDIT_UNION')."""
+    return _RECON_NORM_RE.sub("", str(s or "").lower())
+
+
+def _recon_xlsx_score(name: str) -> int:
+    """0 = not a recon workbook; 1 = '*recon*.xlsx'; 2 = '*recon*output*.xlsx'.
+    Skips Excel lock files (``~$``)."""
+    low = name.lower()
+    if name.startswith("~$") or not low.endswith(".xlsx") or "recon" not in low:
+        return 0
+    return 2 if "output" in low else 1
+
+
+def _recon_name_client_part(filename: str) -> str:
+    """Strip the trailing '..._recon_output' / '..._recon' + extension from a
+    recon filename to recover the client-name portion for matching."""
+    stem = filename[:-5] if filename.lower().endswith(".xlsx") else filename
+    return re.sub(r"[ _-]*recon([ _-]*output)?\s*$", "", stem, flags=re.IGNORECASE)
+
+
+def _recon_best_in_dir(d: Path) -> Optional[Path]:
+    """Best recon workbook physically inside ``d`` — used for a client's OWN
+    INPUT folder, where any recon file is unambiguously theirs."""
+    try:
+        entries = list(d.iterdir())
+    except Exception:
+        return None
+    best: Optional[tuple[int, Path]] = None
+    for p in entries:
+        try:
+            if not p.is_file():
+                continue
+        except Exception:
+            continue
+        score = _recon_xlsx_score(p.name)
+        if score and (best is None or score > best[0]):
+            best = (score, p)
+    return best[1] if best else None
+
+
+def _recon_match_by_name(client: str, dirs: list) -> Optional[Path]:
+    """Among recon workbooks across ``dirs`` (each holding MANY clients' files),
+    return the one whose filename client-portion matches ``client`` by strict
+    normalization (exact > substring, ≥4 chars). None when nothing matches."""
+    cnorm = _recon_norm(client)
+    if not cnorm:
+        return None
+    best: Optional[tuple[int, int, Path]] = None   # (score, -len(fnorm), path)
+    seen: set = set()
+    for d in dirs:
+        try:
+            if not d.is_dir():
+                continue
+            entries = list(d.iterdir())
+        except Exception:
+            continue
+        for p in entries:
+            try:
+                if not p.is_file() or not _recon_xlsx_score(p.name):
+                    continue
+                rp = p.resolve()
+            except Exception:
+                continue
+            if rp in seen:
+                continue
+            seen.add(rp)
+            fnorm = _recon_norm(_recon_name_client_part(p.name))
+            if not fnorm:
+                continue
+            if fnorm == cnorm:
+                score = 3
+            elif len(fnorm) >= 4 and fnorm in cnorm:
+                score = 2
+            elif len(cnorm) >= 4 and cnorm in fnorm:
+                score = 2
+            else:
+                continue
+            key = (score, -len(fnorm), p)
+            if best is None or key[:2] > best[:2]:
+                best = key
+    return best[2] if best else None
+
+
+def _recon_file_for_client(client: str, core: str = "") -> Optional[Path]:
+    """Locate a client's Billing Recon '<client>_recon_output.xlsx' workbook.
+
+    Search order: (1) the client's own INPUT folder (local copy); (2) the
+    canonical 'Recon Outputs/<Core>/' tree matched by normalized client name,
+    falling back to every Core subfolder + the Recon Outputs root when the core
+    is unknown. Returns None when nothing is found."""
+    if not core:
+        core = _core_for_client(client)
+    # 1) The client's own INPUT folder (e.g. the manually-placed DNA pair).
+    hit = _recon_best_in_dir(client_input_dir(client, core))
+    if hit:
+        return hit
+    # 2) Canonical Recon Outputs/<core>/, then any-core fallback.
+    dirs: list = []
+    if core:
+        dirs.append(RECON_OUTPUTS_DIR / core)
+    try:
+        if RECON_OUTPUTS_DIR.is_dir():
+            dirs += [c for c in RECON_OUTPUTS_DIR.iterdir() if c.is_dir()]
+            dirs.append(RECON_OUTPUTS_DIR)
+    except Exception:
+        pass
+    return _recon_match_by_name(client, dirs)
+
+
+def _read_recon_review_sheet(path: Path) -> Optional[pd.DataFrame]:
+    """Read the 'Review Required' sheet (case-insensitive sheet match). Returns
+    None when the workbook has no such sheet or can't be read. Uses a context
+    manager so the workbook handle is released promptly — it lives in a folder a
+    Billing Recon job may rewrite in place."""
+    try:
+        with pd.ExcelFile(str(path)) as xl:
+            sheet = next((s for s in xl.sheet_names
+                          if str(s).strip().lower() == _RECON_REVIEW_SHEET.lower()),
+                         None)
+            if sheet is None:
+                return None
+            return xl.parse(sheet)
+    except Exception:
+        return None
+
+
+def _clean_cell(v) -> str:
+    """Stringify a cell for the prompt: drop NaN/None, trim trailing '.0' on
+    integer-valued floats (page numbers), collapse whitespace."""
+    if v is None:
+        return ""
+    s = str(v).strip()
+    if not s or s.lower() in ("nan", "none", "nat"):
+        return ""
+    if s.endswith(".0") and s[:-2].isdigit():
+        s = s[:-2]
+    return re.sub(r"\s+", " ", s)
+
+
+def build_recon_review_context(focus: list[str]) -> str:
+    """Build the BILLING RECONCILIATION — REVIEW REQUIRED context block for the
+    focused client(s). Returns '' when no recon workbook is found for any of them
+    (so the system prompt falls back to its "not available" guidance)."""
+    blocks: list[str] = []
+    no_file: list[str] = []
+    for client in focus:
+        path = _recon_file_for_client(client)
+        if not path:
+            no_file.append(client)
+            continue
+        df = _read_recon_review_sheet(path)
+        if df is None or df.empty:
+            blocks.append(
+                f"\n— {client}: Billing Recon workbook found ({path.name}) but its "
+                f"'{_RECON_REVIEW_SHEET}' sheet is missing or empty — no "
+                "contract→invoice misses recorded for this client.")
+            continue
+
+        n = len(df)
+        rows = df.head(_RECON_MAX_ROWS)
+        blocks.append(
+            f"\n— {client} (from {path.name}, '{_RECON_REVIEW_SHEET}' sheet): "
+            f"{n} contract fee(s) potentially MISSING FROM THE INVOICE.")
+        for _, row in rows.iterrows():
+            # Material-code header differs by Core (Final vs Original Material
+            # Code); try each in order, else fall back to the invoice-side code.
+            code = next((c for c in (_clean_cell(row.get(col))
+                                     for col in _RECON_CODE_COLS) if c),
+                        "(no code assigned)")
+            desc = _clean_cell(row.get("Tool-extracted Description")) or "(no description)"
+            src  = _clean_cell(row.get("Source Contract"))
+            page = _clean_cell(row.get("Page Number"))
+            date = _clean_cell(row.get("Contract Date"))
+            price = (_clean_cell(row.get("Tool-extracted Price"))
+                     or _clean_cell(row.get("Cleaned Price")))
+            assess = _clean_cell(row.get("Assessment"))
+            src_str = ""
+            if src:
+                src_str = f"  source: {src}" + (f" [p.{page}]" if page else "")
+            line = (f"    • [CONTRACT] code={code} | \"{desc[:90]}\""
+                    + (f" | {price}" if price else "")
+                    + (f" | contract date {date}" if date else "")
+                    + src_str)
+            blocks.append(line)
+            if assess:
+                blocks.append(f"        ↳ recon note: {assess[:200]}")
+        if n > len(rows):
+            blocks.append(f"    (+{n - len(rows)} more row(s) not shown — recon "
+                          f"sheet has {n} total; ask to narrow by contract.)")
+
+    if not blocks:
+        # This builder runs only on comparison/invoice questions, so reaching
+        # here means NONE of the focused clients has a recon workbook. Return an
+        # explicit "not available" block (rather than "" → the generic template
+        # fallback, whose "re-ask as a comparison" hint would be misleading when
+        # the file genuinely doesn't exist) so the model says so plainly and
+        # doesn't fabricate a missing-from-invoice list.
+        return (
+            "=== BILLING RECONCILIATION — REVIEW REQUIRED ===\n"
+            "No Billing Recon workbook (\"<client>_recon_output.xlsx\") was found "
+            "for the focused client(s): " + ", ".join(no_file or focus) + ".\n"
+            "You therefore CANNOT give the authoritative contract→invoice "
+            "'missing from invoice' list for them. If the user asks which "
+            "contract codes/fees are missing from the invoice (the CONTRACT → "
+            "INVOICE direction), tell them the Billing Recon output isn't "
+            "available for this client and you cannot produce that list — and do "
+            "NOT fabricate it from the raw MATERIAL CODE RECONCILIATION bucket or "
+            "the EXTRACTED LINE ITEMS.")
+
+    # In a mixed-client selection, name the focused clients that had NO recon
+    # workbook so the model doesn't implicitly treat them as "no misses".
+    if no_file:
+        blocks.append(
+            "\n— No Billing Recon workbook was found for: " + ", ".join(no_file)
+            + " — you cannot list their contract→invoice misses; say so rather "
+            "than implying they have none.")
+
+    header = (
+        "=== BILLING RECONCILIATION — REVIEW REQUIRED "
+        "(authoritative: contract fees/codes potentially MISSING FROM THE "
+        "INVOICE) ===\n"
+        "This is the human-reviewed 'Review Required' output of the Billing "
+        "Recon scripts — the AUTHORITATIVE source for the CONTRACT → INVOICE "
+        "direction (what the contract expects to be billed but that is absent "
+        "from the SAP invoices). When the user asks which contract codes/fees "
+        "are missing from the invoice, answer STRICTLY from the rows below and "
+        "end with the required biller-verification disclaimer (see the CONTRACT "
+        "↔ INVOICE COMPARISONS rules). Do NOT use this section for the reverse "
+        "(invoice → contract) direction."
+    )
+    return header + "\n" + "\n".join(blocks)
+
+
+# Comparison / reconciliation question gate — when true we attach the Billing
+# Recon "Review Required" block. Broader than is_invoice_query so a follow-up
+# like "now the other way around" or "and vice versa" still pulls the data.
+_COMPARISON_RE = re.compile(
+    r"compar|reconcil|\brecon\b|missing|not\s+(?:in|on|billed|present|found|"
+    r"invoiced|charged)|present\s+in|absent|vice\s*versa|the\s+other\s+way|"
+    r"the\s+other\s+one|other\s+direction|\breverse\b|\bflip\b|\bopposite\b|"
+    r"in\s+the\s+contract\s+but|on\s+the\s+invoice\s+but|under[\s-]?bill|"
+    r"over[\s-]?bill|review\s+required|potential\s+miss|\bvs\.?\b|versus|"
+    r"billed\s+but|contracted\s+but",
+    re.IGNORECASE,
+)
+
+
+def _wants_recon_context(text: str) -> bool:
+    """True when the question looks like a contract↔invoice comparison /
+    reconciliation (or any invoice-style question), so the Review Required block
+    is worth attaching."""
+    if not text:
+        return False
+    try:
+        import snowflake_invoice as _sf
+        if _sf.is_invoice_query(text):
+            return True
+    except Exception:
+        pass
+    return bool(_COMPARISON_RE.search(text))
+
+
 # ── Chat ────────────────────────────────────────────────────────────────────────
 
 def build_chat_reply(focus: list[str], messages: list[dict],
@@ -729,12 +1026,37 @@ def build_chat_reply(focus: list[str], messages: list[dict],
     last_user = next((m["content"] for m in reversed(messages)
                       if m.get("role") == "user"), "")
 
+    # Does this turn look like a contract↔invoice comparison / invoice question?
+    # Drives BOTH the recon block and (Direction-B needs it) the invoice fetch.
+    want_recon = _wants_recon_context(last_user)
+
+    # Billing Recon "Review Required" — authoritative contract→invoice
+    # "missing from invoice" list. File-based (client Input / Recon Outputs
+    # folder), so built independently of Snowflake / use_snowflake. Built first
+    # so we can tell the invoice builder to drop its (unreliable) CONTRACT-ONLY
+    # bucket when the authoritative recon list is available.
+    recon_ctx = ""
+    try:
+        if want_recon:
+            recon_ctx = build_recon_review_context(focus)
+    except Exception:
+        recon_ctx = ""
+
     invoice_ctx = ""
     if use_snowflake:
         try:
             import snowflake_invoice as _sf
-            if _sf.is_invoice_query(last_user):
-                invoice_ctx = _sf.build_invoice_context(focus, last_user)
+            # Fetch invoice data for invoice questions AND any comparison turn —
+            # Direction B (invoice→contract) needs the SAP codes even for terse
+            # follow-ups ("and vice versa") that is_invoice_query alone misses.
+            if want_recon:
+                invoice_ctx = _sf.build_invoice_context(
+                    focus, last_user,
+                    # When the recon "Review Required" list is present it is the
+                    # authoritative contract→invoice source; suppress the live
+                    # reconciliation's CONTRACT-ONLY bucket so the model isn't
+                    # handed two competing missing-from-invoice lists.
+                    suppress_contract_only=bool(recon_ctx))
         except Exception as e:
             invoice_ctx = (
                 "=== SAP INVOICE DATA ===\n"
@@ -754,6 +1076,7 @@ def build_chat_reply(focus: list[str], messages: list[dict],
         cpi_context=ctx.get("cpi", ""),
         clauses_context=ctx.get("clauses", ""),
         invoice_context=invoice_ctx,
+        recon_context=recon_ctx,
     )
     history = [{"role": m["role"], "content": m["content"]}
                for m in messages if m.get("role") in ("user", "assistant")]

@@ -1335,13 +1335,20 @@ _ERR_QUOTE_INSTRUCTION = (
 )
 
 
-def build_invoice_context(client_names: list[str], question: str = "") -> str:
+def build_invoice_context(client_names: list[str], question: str = "",
+                          suppress_contract_only: bool = False) -> str:
     """Return a chat-ready INVOICE context block for the focused client(s).
 
     Safe to call unconditionally — but the chatbot only calls it when
     :func:`is_invoice_query` is true, to avoid a Snowflake round-trip on every
     message. Never raises: any failure becomes a notice string the LLM relays
-    verbatim to the user."""
+    verbatim to the user.
+
+    ``suppress_contract_only`` — when True, the MATERIAL CODE RECONCILIATION
+    block omits its CONTRACT-ONLY bucket (the agent-vs-invoice "in contract, not
+    on invoice" diff). The caller sets this when the authoritative Billing Recon
+    "Review Required" list is present, so the model isn't handed two competing
+    contract→invoice missing lists."""
     # 1) Connector present?
     if not snowflake_available():
         return ("=== SAP INVOICE DATA ===\n"
@@ -1461,7 +1468,8 @@ def build_invoice_context(client_names: list[str], question: str = "") -> str:
         agent_map = _agent_material_map(client)
         rec = reconcile_materials(agent_map, inv)
 
-        blocks.append(_render_reconciliation(rec))
+        blocks.append(_render_reconciliation(
+            rec, include_contract_only=not suppress_contract_only))
         blocks.append(_render_invoice_lines(inv))
 
     # ── 8) DIRECT invoice-number lookup ────────────────────────────────────
@@ -1777,7 +1785,7 @@ def _summarize_material_hits(code: str, df: pd.DataFrame) -> str:
             f"e.g. {'; '.join(examples)}{more}")
 
 
-def _render_reconciliation(rec: dict) -> str:
+def _render_reconciliation(rec: dict, include_contract_only: bool = True) -> str:
     """Render the MATERIAL CODE RECONCILIATION block — the highest-value part.
     Spells out, per the user's rules, how the LLM should present each case.
 
@@ -1827,13 +1835,22 @@ def _render_reconciliation(rec: dict) -> str:
                 f"\"{r['invoice_text'][:60]}\""
                 + (f" (product hier: {r['product_hier'][:40]})" if r['product_hier'] else "")
                 + f"; invoice {docs}")
-    if co:
+    if co and include_contract_only:
         lines.append(f"\n  ➖ CONTRACT-ONLY ({len(co)}) — agent matched a code with no invoice line:")
         for r in co[:40]:
             pp = _fmt_contract_pages(r.get("contract_pages") or [])
             lines.append(
                 f"    • [CONTRACT] code {r['code']} — \"{r['desc'][:60]}\" "
                 f"(from {r['source_contract'] or '?'}{pp}; not yet billed)")
+    elif co and not include_contract_only:
+        # The authoritative contract→invoice "missing from invoice" list is the
+        # BILLING RECONCILIATION — REVIEW REQUIRED section; don't emit a second,
+        # less-reliable list here. (See chat_engine Direction-A rules.)
+        lines.append(
+            f"\n  ➖ CONTRACT-ONLY: {len(co)} agent-matched code(s) have no "
+            "invoice line, but this bucket is SUPPRESSED — for the authoritative "
+            "contract→invoice 'missing from invoice' list use the BILLING "
+            "RECONCILIATION — REVIEW REQUIRED section instead.")
     if ma:
         lines.append(f"\n  ✓ MATCH ({len(ma)}) — code agrees on both sides:")
         for r in ma[:40]:

@@ -371,7 +371,7 @@ export default function ChatbotView() {
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <div className="font-mono text-[9px] uppercase tracking-[0.24em] text-primary">
-                Cognitive Engine · Online
+                Billing Intelligence
               </div>
               <h2 className="pt-3 text-[28px] font-semibold tracking-tight text-ink">
                 {greeting}
