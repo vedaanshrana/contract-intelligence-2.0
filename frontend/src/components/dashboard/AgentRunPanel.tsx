@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { AlertCircle, Check, Circle, Play, Square } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { AlertCircle, Check, Circle, Play, Square, X } from 'lucide-react'
 import { runAgentStream } from '../../api'
 import { FRONTEND_AGENTS } from '../../constants'
 import type { ClientStatus, PipelineEvent } from '../../types'
@@ -30,9 +31,14 @@ export default function AgentRunPanel({
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [live, setLive] = useState<Record<string, LiveStatus>>({})
   // Human-readable reason for the latest run of each agent (the backend's
-  // `summary` / error message). Surfaced inline + on hover so a failed/skipped
-  // agent tells the user WHY, e.g. "skipped — no master agreement found".
+  // `summary` / error message). Surfaced inline + in a click popup so a
+  // failed/skipped agent tells the user WHY, e.g. "skipped — no master
+  // agreement found".
   const [reasons, setReasons] = useState<Record<string, string>>({})
+  // Error-detail popup: which failed agent's reason is open + where to anchor it.
+  const [errPopup, setErrPopup] = useState<
+    { display: string; reason: string; x: number; y: number } | null
+  >(null)
   const [runningKey, setRunningKey] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [logLine, setLogLine] = useState('')
@@ -40,6 +46,27 @@ export default function AgentRunPanel({
 
   // Abort any in-flight stream if the panel unmounts (row collapsed / nav away).
   useEffect(() => () => abortRef.current?.(), [])
+
+  // Open the error-detail popup anchored under the clicked element.
+  const showError = useCallback((display: string, reason: string, el: HTMLElement) => {
+    const r = el.getBoundingClientRect()
+    setErrPopup({
+      display,
+      reason: (reason && reason.trim()) || 'This agent did not complete successfully.',
+      x: r.left,
+      y: r.bottom,
+    })
+  }, [])
+
+  // Close the error popup on Escape.
+  useEffect(() => {
+    if (!errPopup) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setErrPopup(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [errPopup])
 
   const statusFor = useCallback(
     (key: string): LiveStatus => {
@@ -205,16 +232,30 @@ export default function AgentRunPanel({
                 onChange={() => toggle(a.key)}
                 className="h-3 w-3 shrink-0 accent-primary disabled:opacity-40"
               />
-              <AgentStatusIcon status={st} reason={why} />
+              {failed ? (
+                <button
+                  type="button"
+                  onClick={(e) => showError(a.display, why, e.currentTarget)}
+                  className="inline-flex shrink-0 cursor-pointer items-center rounded-sm transition-colors hover:bg-bad-dim"
+                  aria-label={`Show why ${a.display} did not complete`}
+                  title="Click for the error details"
+                >
+                  <AlertCircle size={12} className="text-bad" />
+                </button>
+              ) : (
+                <AgentStatusIcon status={st} />
+              )}
               <div className="min-w-0 flex-1">
                 <span className="block truncate text-[11px] text-ink-2">{a.display}</span>
-                {failed && why && (
-                  <span
-                    className="block truncate font-mono text-[9px] leading-tight text-bad"
-                    title={why}
+                {failed && (
+                  <button
+                    type="button"
+                    onClick={(e) => showError(a.display, why, e.currentTarget)}
+                    className="block max-w-full truncate text-left font-mono text-[9px] leading-tight text-bad underline decoration-dotted underline-offset-2 hover:text-bad/80"
+                    title="Click for the full error"
                   >
-                    {why}
-                  </span>
+                    {why || 'did not complete — click for details'}
+                  </button>
                 )}
               </div>
               <button
@@ -239,11 +280,56 @@ export default function AgentRunPanel({
           </span>
         </div>
       )}
+
+      {/* Error-detail popup — click a failed agent's sign / reason to open it.
+          Rendered through a portal with fixed positioning so the surrounding
+          scroll containers can't clip it. */}
+      {errPopup &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-[60]"
+              onClick={() => setErrPopup(null)}
+            />
+            <div
+              role="dialog"
+              aria-label={`${errPopup.display} error details`}
+              onClick={(e) => e.stopPropagation()}
+              className="fixed z-[61] w-[340px] max-w-[92vw] border border-line-strong bg-surface shadow-2xl"
+              style={{
+                left: Math.max(8, Math.min(errPopup.x, window.innerWidth - 348)),
+                top: Math.min(errPopup.y + 6, Math.max(8, window.innerHeight - 200)),
+              }}
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-line bg-bad-dim px-3 py-2">
+                <span className="flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-bad">
+                  <AlertCircle size={12} /> {errPopup.display} — did not complete
+                </span>
+                <button
+                  onClick={() => setErrPopup(null)}
+                  className="shrink-0 text-ink-3 transition-colors hover:text-ink"
+                  aria-label="Close error details"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+              <div className="px-3 py-2.5">
+                <p className="whitespace-pre-wrap break-words font-mono text-[10.5px] leading-relaxed text-ink-2">
+                  {errPopup.reason}
+                </p>
+                <p className="mt-2 border-t border-line/60 pt-2 text-[9px] text-ink-3">
+                  Resolve the cause above, then re-run this agent.
+                </p>
+              </div>
+            </div>
+          </>,
+          document.body,
+        )}
     </div>
   )
 }
 
-function AgentStatusIcon({ status, reason }: { status: LiveStatus; reason?: string }) {
+function AgentStatusIcon({ status }: { status: LiveStatus }) {
   switch (status) {
     case 'done':
       return <Check size={12} strokeWidth={3} className="shrink-0 text-ok" />
@@ -254,15 +340,8 @@ function AgentStatusIcon({ status, reason }: { status: LiveStatus; reason?: stri
     case 'queued':
       return <Circle size={11} className="shrink-0 text-ink-3" />
     case 'error':
-      // Hover the sign to read the exact reason the agent didn't complete.
-      return (
-        <span
-          className="inline-flex shrink-0 cursor-help"
-          title={reason || 'This agent did not complete successfully.'}
-        >
-          <AlertCircle size={12} className="text-bad" />
-        </span>
-      )
+      // (Error rows render a clickable sign in the row itself — see above.)
+      return <AlertCircle size={12} className="shrink-0 text-bad" />
     default:
       return <Circle size={11} className="shrink-0 text-line-strong" />
   }
