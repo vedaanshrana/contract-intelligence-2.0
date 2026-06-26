@@ -29,6 +29,10 @@ export default function AgentRunPanel({
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [live, setLive] = useState<Record<string, LiveStatus>>({})
+  // Human-readable reason for the latest run of each agent (the backend's
+  // `summary` / error message). Surfaced inline + on hover so a failed/skipped
+  // agent tells the user WHY, e.g. "skipped — no master agreement found".
+  const [reasons, setReasons] = useState<Record<string, string>>({})
   const [runningKey, setRunningKey] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [logLine, setLogLine] = useState('')
@@ -56,6 +60,12 @@ export default function AgentRunPanel({
         keys.forEach((k) => (n[k] = 'queued'))
         return n
       })
+      // Clear any stale reason for the agents about to re-run.
+      setReasons((r) => {
+        const n = { ...r }
+        keys.forEach((k) => delete n[k])
+        return n
+      })
 
       let i = 0
       const runNext = () => {
@@ -79,12 +89,27 @@ export default function AgentRunPanel({
             } else if (ev.type === 'agent_done') {
               const ok = ev.status === 'complete' || ev.status === 'cached'
               setLive((s) => ({ ...s, [key]: ok ? 'done' : 'error' }))
+              // Capture WHY: the backend's human-readable summary (e.g.
+              // "skipped — no master agreement found — run Hierarchy first"),
+              // else the raw error, else the bare status code.
+              const resErr =
+                ev.result && typeof ev.result.error === 'string' ? ev.result.error : ''
+              const why =
+                (ev.summary && ev.summary.trim()) ||
+                resErr ||
+                (ev.status ? `status: ${ev.status}` : '')
+              setReasons((r) => ({ ...r, [key]: why }))
             }
           },
           () => runNext(), // stream closed → next agent
           () => {
             // stream-level error → mark this one failed and keep going
             setLive((s) => ({ ...s, [key]: 'error' }))
+            setReasons((r) => ({
+              ...r,
+              [key]:
+                'The agent stream ended unexpectedly (backend error or lost connection). Check the backend terminal/logs for the traceback.',
+            }))
             runNext()
           },
         )
@@ -165,11 +190,13 @@ export default function AgentRunPanel({
         {FRONTEND_AGENTS.map((a) => {
           const st = statusFor(a.key)
           const checked = selected.has(a.key)
+          const why = reasons[a.key]
+          const failed = st === 'error'
           return (
             <div
               key={a.key}
               className="flex items-center gap-2 bg-surface px-3 py-2"
-              title={a.blurb}
+              title={failed && why ? why : a.blurb}
             >
               <input
                 type="checkbox"
@@ -178,8 +205,18 @@ export default function AgentRunPanel({
                 onChange={() => toggle(a.key)}
                 className="h-3 w-3 shrink-0 accent-primary disabled:opacity-40"
               />
-              <AgentStatusIcon status={st} />
-              <span className="min-w-0 flex-1 truncate text-[11px] text-ink-2">{a.display}</span>
+              <AgentStatusIcon status={st} reason={why} />
+              <div className="min-w-0 flex-1">
+                <span className="block truncate text-[11px] text-ink-2">{a.display}</span>
+                {failed && why && (
+                  <span
+                    className="block truncate font-mono text-[9px] leading-tight text-bad"
+                    title={why}
+                  >
+                    {why}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={() => runKeys([a.key])}
                 disabled={busy || disabled}
@@ -206,7 +243,7 @@ export default function AgentRunPanel({
   )
 }
 
-function AgentStatusIcon({ status }: { status: LiveStatus }) {
+function AgentStatusIcon({ status, reason }: { status: LiveStatus; reason?: string }) {
   switch (status) {
     case 'done':
       return <Check size={12} strokeWidth={3} className="shrink-0 text-ok" />
@@ -217,7 +254,15 @@ function AgentStatusIcon({ status }: { status: LiveStatus }) {
     case 'queued':
       return <Circle size={11} className="shrink-0 text-ink-3" />
     case 'error':
-      return <AlertCircle size={12} className="shrink-0 text-bad" />
+      // Hover the sign to read the exact reason the agent didn't complete.
+      return (
+        <span
+          className="inline-flex shrink-0 cursor-help"
+          title={reason || 'This agent did not complete successfully.'}
+        >
+          <AlertCircle size={12} className="text-bad" />
+        </span>
+      )
     default:
       return <Circle size={11} className="shrink-0 text-line-strong" />
   }
