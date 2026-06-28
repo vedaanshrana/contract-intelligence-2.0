@@ -114,6 +114,48 @@ VALIDATION_MODEL   = os.environ.get("VALIDATION_MODEL", "gpt-4.1-2025-04-14")
 # Which LLM backend to use — "openai" (default) or "fiserv" (VDI Foundation API)
 OPENAI_BACKEND = (os.environ.get("OPENAI_BACKEND") or "openai").lower()
 
+# ── Model pricing (USD per 1,000,000 tokens) ──────────────────────────────────
+# Drives the "Total Run Cost" stat in the Agents tab. Each agent can use a
+# different model, so cost is summed per model from each run's token usage.
+#
+# Keys are BASE model names; a recorded model is matched by LONGEST-PREFIX, so
+# dated snapshots resolve to their family automatically, e.g.
+#   "gpt-5.2-2025-12-11"      → "gpt-5.2"
+#   "gpt-4o-mini-2024-07-18"  → "gpt-4o-mini"
+#   "gpt-4.1-2025-04-14"      → "gpt-4.1"   (NOT "gpt-4.1-mini")
+#
+# The first three rows are the prices from the OpenAI pricing table; gpt-4.1 and
+# gpt-4o-mini are OpenAI public list prices (the matching/chat/validation and
+# CPI/scope agents use them but they aren't in that table). Adjust any row here
+# and the Run Cost figure updates — no other code change needed. A model that
+# matches no key contributes $0 (and should be added below).
+#                  (input_per_1M, output_per_1M)
+MODEL_PRICING: dict[str, tuple[float, float]] = {
+    "gpt-5.2":      (1.75, 14.00),
+    "gpt-5.1":      (1.25, 10.00),
+    "gpt-4.1-mini": (0.40,  1.60),
+    "gpt-4.1":      (2.00,  8.00),
+    "gpt-4o-mini":  (0.15,  0.60),
+}
+
+
+def price_for_model(name: str) -> tuple[float, float]:
+    """Return (input_price, output_price) per 1M tokens for a model name.
+
+    Case-insensitive longest-prefix match against MODEL_PRICING so dated
+    snapshots (e.g. "gpt-5.2-2025-12-11") resolve to their family ("gpt-5.2").
+    Returns (0.0, 0.0) when nothing matches — such models cost $0 in the total
+    until a price is added to MODEL_PRICING."""
+    n = (name or "").strip().lower()
+    if not n:
+        return (0.0, 0.0)
+    best_key = ""
+    for key in MODEL_PRICING:
+        k = key.lower()
+        if n.startswith(k) and len(k) > len(best_key):
+            best_key = key
+    return MODEL_PRICING.get(best_key, (0.0, 0.0))
+
 # ── Extraction settings ───────────────────────────────────────────────────────
 DPI         = 600   # PDF render resolution (mirrors existing scripts)
 CHUNK_SIZE  = 8    # PDF pages per API call

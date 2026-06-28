@@ -32,7 +32,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from config import OUTPUT_DIR
+from config import OUTPUT_DIR, price_for_model
 
 _lock = threading.Lock()
 # In-memory tape of individual LLM calls for the current process/session.
@@ -156,6 +156,27 @@ def reset() -> None:
     """Clear the in-memory tape (called after each finalize to bound memory)."""
     with _lock:
         _calls.clear()
+
+
+# ── Cost ──────────────────────────────────────────────────────────────────────
+def cost_for_run(rec: dict) -> float:
+    """USD cost of a single run record, summed per model from MODEL_PRICING.
+
+    Prefers the `per_model` token breakdown (different agents — and even calls
+    within one agent — can hit different models). Falls back to the aggregate
+    input/output_tokens against the record's `model` label for older records
+    that predate per_model. Models with no price match contribute $0."""
+    per_model = rec.get("per_model") or {}
+    if per_model:
+        total = 0.0
+        for name, bucket in per_model.items():
+            in_p, out_p = price_for_model(name)
+            total += (bucket.get("input", 0) or 0) / 1_000_000 * in_p
+            total += (bucket.get("output", 0) or 0) / 1_000_000 * out_p
+        return total
+    in_p, out_p = price_for_model(rec.get("model", ""))
+    return ((rec.get("input_tokens", 0) or 0) / 1_000_000 * in_p
+            + (rec.get("output_tokens", 0) or 0) / 1_000_000 * out_p)
 
 
 # ── Persistence (one JSON file per client) ────────────────────────────────────

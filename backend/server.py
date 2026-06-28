@@ -168,7 +168,7 @@ def get_clients(core: str = "", status: bool = True):
     clients = ar.list_clients(core)
     if not status:
         return [{"client": c} for c in clients]
-    return [ar.client_status(c) for c in clients]
+    return [ar.client_status(c, core) for c in clients]
 
 
 @app.get("/api/clients/{client}/status")

@@ -37,6 +37,7 @@ export interface ClientStatus {
   agentsDone: number
   agentsTotal: number
   contracts: number
+  pages: number
   state: ClientState
 }
 
@@ -101,6 +102,7 @@ export interface MetricsResult {
   totals: {
     inputTokens: number
     outputTokens: number
+    costUsd: number
     runtimeS: number
     runCount: number
   }

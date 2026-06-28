@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Activity, ChevronDown, ChevronRight, Download, ExternalLink, GitBranch, Search } from 'lucide-react'
-import { formatInt, useApp } from '../../store'
+import { formatInt, formatUsd, useApp } from '../../store'
 import { api } from '../../api'
 import { FRONTEND_AGENTS } from '../../constants'
 import type { ClientStatus, MetricsResult, OutputTable } from '../../types'
@@ -216,15 +216,27 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
       {/* token & performance ticker (real metrics) */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-line bg-surface-2/50 px-4 py-1.5 font-mono text-[10px]">
         <span className="text-ink-3">
-          Input Tokens: <span className="text-ink">{formatInt(totals?.inputTokens ?? 0)}</span>
+          Total Input Tokens: <span className="text-ink">{formatInt(totals?.inputTokens ?? 0)}</span>
         </span>
         <span className="text-line-strong">|</span>
         <span className="text-ink-3">
-          Output Tokens: <span className="text-ink">{formatInt(totals?.outputTokens ?? 0)}</span>
+          Total Output Tokens: <span className="text-ink">{formatInt(totals?.outputTokens ?? 0)}</span>
         </span>
         <span className="text-line-strong">|</span>
         <span className="text-ink-3">
-          Total Runtime: <span className="text-primary">{formatInt(totals?.runtimeS ?? 0)}s</span>
+          Total Run Cost: <span className="text-ok">{formatUsd(totals?.costUsd ?? 0)}</span>
+        </span>
+        <span className="text-line-strong">|</span>
+        <span className="text-ink-3">
+          Total Run Time: <span className="text-primary">{formatInt(totals?.runtimeS ?? 0)}s</span>
+        </span>
+        <span className="text-line-strong">|</span>
+        <span className="text-ink-3">
+          Contracts: <span className="text-ink">{formatInt(client.contracts ?? 0)}</span>
+        </span>
+        <span className="text-line-strong">|</span>
+        <span className="text-ink-3">
+          Pages: <span className="text-ink">{formatInt(client.pages ?? 0)}</span>
         </span>
         <span className="text-line-strong">|</span>
         <span className="text-ink-3">

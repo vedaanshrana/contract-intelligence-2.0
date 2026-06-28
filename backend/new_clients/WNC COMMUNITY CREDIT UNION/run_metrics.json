@@ -1,0 +1,54 @@
+[
+  {
+    "agent": "extraction",
+    "display": "Fee Description Agent",
+    "timestamp": "2026-06-28T21:13:07",
+    "runtime_s": 699.98,
+    "model": "gpt-5.2-2025-12-11",
+    "input_tokens": 360080,
+    "output_tokens": 24807,
+    "total_tokens": 384887,
+    "calls": 9,
+    "status": "complete",
+    "per_model": {
+      "gpt-5.2-2025-12-11": {
+        "calls": 9,
+        "input": 360080,
+        "output": 24807,
+        "total": 384887,
+        "requested_models": [
+          "gpt-5.2-2025-12-11"
+        ],
+        "actual_models": [
+          "gpt-5.2-2025-12-11"
+        ]
+      }
+    }
+  },
+  {
+    "agent": "material_match",
+    "display": "Material Code Matching Agent",
+    "timestamp": "2026-06-28T21:29:13",
+    "runtime_s": 200.39,
+    "model": "gpt-4.1-2025-04-14",
+    "input_tokens": 276079,
+    "output_tokens": 60482,
+    "total_tokens": 336561,
+    "calls": 76,
+    "status": "complete",
+    "per_model": {
+      "gpt-4.1-2025-04-14": {
+        "calls": 76,
+        "input": 276079,
+        "output": 60482,
+        "total": 336561,
+        "requested_models": [
+          "gpt-4.1-2025-04-14"
+        ],
+        "actual_models": [
+          "gpt-4.1-2025-04-14"
+        ]
+      }
+    }
+  }
+]

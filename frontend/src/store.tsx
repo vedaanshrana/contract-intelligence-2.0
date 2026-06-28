@@ -288,3 +288,14 @@ export function formatMs(ms: number) {
 export function formatInt(n: number) {
   return Math.round(n || 0).toLocaleString('en-US')
 }
+
+/** USD with cents, e.g. 12.4 → "$12.40". Sub-cent costs keep 4 dp so a tiny
+ *  run still reads as non-zero (e.g. "$0.0032") instead of "$0.00". */
+export function formatUsd(n: number) {
+  const v = n || 0
+  const digits = v > 0 && v < 0.01 ? 4 : 2
+  return `$${v.toLocaleString('en-US', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })}`
+}

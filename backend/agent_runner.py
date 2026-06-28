@@ -233,7 +233,81 @@ def count_contracts(client: str) -> int:
     return 0
 
 
-def client_status(client: str) -> dict:
+# ── Page counting (Pages stat) ──────────────────────────────────────────────--
+# Pages = total PDF pages across ALL of a client's input contracts.
+#
+# For NEW clients this is counted automatically from the PDFs in their Input
+# folder (see count_pages). For clients run before page-counting existed whose
+# input PDFs are no longer on disk, automatic counting returns 0 — type the
+# manually-counted total here, keyed by the EXACT client folder name:
+#
+#   _MANUAL_PAGE_COUNTS = {
+#       "FICARE FCU": 312,
+#       "ZELLCO FEDERAL CREDIT UNION": 540,
+#   }
+#
+# An entry here ALWAYS wins over automatic counting, so you can also use it to
+# override a client whose PDFs are present but miscount.
+_MANUAL_PAGE_COUNTS: dict[str, int] = {
+}
+
+# client → (pdf-set signature, page count). Counting opens every PDF, so we
+# cache on the set's (name, size, mtime) signature; it invalidates the moment a
+# PDF is added/removed/modified. Keeps the /clients status sweep cheap.
+_PAGE_COUNT_CACHE: dict[str, tuple] = {}
+_PAGE_CACHE_LOCK = threading.Lock()
+
+
+def count_pages(client: str, core: str = "") -> int:
+    """Total PDF pages across all of a client's input contracts.
+
+    Manual overrides in _MANUAL_PAGE_COUNTS always win. Otherwise the pages are
+    counted automatically from the PDFs in the client's Input folder, cached on
+    the PDF-set signature so repeated status calls don't re-open the files."""
+    if client in _MANUAL_PAGE_COUNTS:
+        try:
+            return int(_MANUAL_PAGE_COUNTS[client])
+        except (TypeError, ValueError):
+            return 0
+    if not core:
+        core = _core_for_client(client)
+    cdir = client_input_dir(client, core)
+    if not cdir.exists():
+        return 0
+    try:
+        pdfs = sorted(set(list(cdir.glob("*.pdf")) + list(cdir.glob("*.PDF"))),
+                      key=lambda p: p.name)
+    except Exception:
+        return 0
+    if not pdfs:
+        return 0
+    try:
+        sig = tuple((p.name, p.stat().st_size, int(p.stat().st_mtime)) for p in pdfs)
+    except Exception:
+        sig = None
+    if sig is not None:
+        with _PAGE_CACHE_LOCK:
+            hit = _PAGE_COUNT_CACHE.get(client)
+            if hit and hit[0] == sig:
+                return hit[1]
+    try:
+        import fitz  # PyMuPDF — already a dependency (agents/*, pdf_annotator)
+    except Exception:
+        return 0
+    total = 0
+    for p in pdfs:
+        try:
+            with fitz.open(str(p)) as doc:
+                total += doc.page_count
+        except Exception:
+            continue
+    if sig is not None:
+        with _PAGE_CACHE_LOCK:
+            _PAGE_COUNT_CACHE[client] = (sig, total)
+    return total
+
+
+def client_status(client: str, core: str = "") -> dict:
     """Per-agent done flags + summary counts for one client."""
     agents = {k: _frontend_is_processed(k, client) for k, _ in FRONTEND_AGENTS}
     done = sum(1 for v in agents.values() if v)
@@ -244,6 +318,7 @@ def client_status(client: str) -> dict:
         "agentsDone": done,
         "agentsTotal": total,
         "contracts": count_contracts(client),
+        "pages": count_pages(client, core),
         "state": "done" if done == total else ("partial" if done else "not_run"),
     }
 
@@ -630,6 +705,7 @@ def client_metrics(client: str) -> dict:
     total_in = sum(r.get("input_tokens", 0) for r in runs)
     total_out = sum(r.get("output_tokens", 0) for r in runs)
     total_runtime = sum(r.get("runtime_s", 0) for r in runs)
+    total_cost = sum(run_metrics.cost_for_run(r) for r in runs)
     return {
         "client": client,
         "runs": runs,
@@ -637,6 +713,7 @@ def client_metrics(client: str) -> dict:
         "totals": {
             "inputTokens": total_in,
             "outputTokens": total_out,
+            "costUsd": round(total_cost, 4),
             "runtimeS": round(total_runtime, 2),
             "runCount": len(runs),
         },

@@ -1,0 +1,2789 @@
+{
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---1-2-2019---1656893.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2019-01-22",
+    "effective_date": "2019-01-02",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (\"Amendment\") dated as of 1/2/19 (\"Amendment Effective Date\") between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 3031 Airpark Drive, Flint, MI 48507 (\"Fiserv\"), and FiCare Federal Credit Union with offices located at 3001 Dr. Martin Luther King Jr., Boulevard, Tampa, FL 33607 (\"Client\"), to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\").",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client; and",
+      "WHEREAS, Fiserv and Client wish to amend the Agreement as follows:"
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: E6B841BD-5414-4BD9-BB27-7F1E2C8F308C",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0003a",
+        "position": "printed_footer"
+      },
+      {
+        "value": "69C45A0AB179442F",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Termination of Existing Agreements:",
+            "product": null,
+            "items": [
+              "The Resource Group Services Schedule to ASP Services Exhibit",
+              "TruTeller Software and Third Party Software Schedule to Software Products Exhibit"
+            ]
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 92,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT"
+    ],
+    "section_header_products": [
+      null
+    ],
+    "num_pages": 3,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---10-26-2018---2069939.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": null,
+    "effective_date": "2018-10-26",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (\"Amendment\") dated as of 10/26/18 (\"Amendment Effective Date\") between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 2601 Network Boulevard, Suite 600, Frisco, TX 75034 (\"Fiserv\"), and FiCare Federal Credit Union, as successor to St. Joseph's Hospital Federal Credit Union, with offices located at 3001 W. Dr. Martin Luther King, Jr. Blvd., Tampa, FL 33607 (\"Client\"), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\").",
+      "With respect to the Vehicle Valuator for Credit Unions Services made available to Client under the Account Processing Services Schedule,",
+      "Notwithstanding anything in the Agreement to the contrary, including without limitation Section 7 of the Agreement,",
+      "Notwithstanding Sections 2(a) of the Agreement or anything in the Account Processing Services Schedule to the contrary,",
+      "The terms of Section 5 of the Agreement, of Sections 3, (d), (e), (f), (g), and 5 of the ASP Services Exhibit, and Sections 3, 4(a), (b), (c) of the Account Processing Services Schedule shall not apply to the Vehicle Valuator Services.",
+      "In the event of a conflict between the terms of this Appendix and the terms of the Agreement, the terms of this Appendix shall control, provided, however, to the extent comparable provisions in the Agreement are more restrictive than those set forth in this Appendix, the provisions in the Agreement shall control.",
+      "Credit Sense Services Schedule to ASP Services Exhibit",
+      "Fiserv and Client hereby enter into this Credit Sense Services Schedule (this \"Schedule\") and agree that this Schedule shall be incorporated into and made subject to the provisions of the Agreement entered into and between Client and Fiserv.",
+      "Except as otherwise indicated, capitalized terms in this Schedule not otherwise defined shall have the same meanings as in the Agreement.",
+      "In the event of any conflict, ambiguity or inconsistency between this Schedule and the Agreement, or any other document which may be annexed hereto, the terms of this Schedule shall govern.",
+      "All other Fees shall be payable in accordance with the payment terms set forth in the Agreement.",
+      "To the extent Fiserv's obligations under the Agreement, the ASP Services Exhibit and/or this Schedule are dependent on the actions of a third party,"
+    ],
+    "supersedes_text": "To the extent a corresponding Exhibit or Schedule to the Agreement already exists, the attached Exhibit or Schedule shall replace and otherwise supersede the existing Exhibit or Schedule in its entirety.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 7E77670E-F60D-4245-B380-0673B074018F",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0003",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Renewal of Term.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Account Processing Services Schedule to ASP Services Exhibit.",
+            "product": "Account Processing Services",
+            "items": []
+          },
+          {
+            "text": "Termination of Services.",
+            "product": null,
+            "items": [
+              "eBusiness Services Schedule to the ASP Services Exhibit",
+              "Resource Group Services Schedule to the ASP Services Exhibit",
+              "TruTeller Software and Third Party Software Schedule to the Software Products Exhibit"
+            ]
+          },
+          {
+            "text": "Additional and Replacement Deliverables.",
+            "product": null,
+            "items": [
+              "Credit Sense Services Schedule to ASP Services Exhibit",
+              "eFiciency Services Schedule to ASP Services Exhibit",
+              "Electronic Document Delivery (EDD) Schedule to ASP Services Exhibit",
+              "ID Verification Services Schedule to the ASP Services Exhibit",
+              "Mobiliti Services Schedule to the ASP Services Exhibit",
+              "Originate Services Schedule to ASP Services Exhibit",
+              "Virtual Branch Services Schedule to the ASP Services Exhibit",
+              "Web Signatures for Credit Unions Services Schedule to the ASP Services Exhibit",
+              "Wisdom Services Schedule to ASP Services Exhibit",
+              "Consulting Services Exhibit to Master Agreement",
+              "Custom Development Services Exhibit to Master Agreement",
+              "Equipment Exhibit to Master Agreement",
+              "Portico Equipment Schedule to the Equipment Exhibit",
+              "Laser Checks Software Schedule to the Software Products Exhibit",
+              "Wisdom Hosted Database Software Schedule to the Software Products Exhibit",
+              "Wisdom In-House Software Schedule to the Software Products Exhibit"
+            ]
+          },
+          {
+            "text": "Master Agreement.",
+            "product": "Master Agreement",
+            "items": []
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Account Processing Services Schedule\nto the ASP Services Exhibit",
+        "product": "Account Processing Services",
+        "subheaders": [
+          {
+            "text": "1. DESCRIPTION OF SERVICES.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(a) Base Services:",
+            "product": null,
+            "items": [
+              "Basic Member Processing",
+              "Share Account Processing",
+              "General Ledger Processing",
+              "Certificate Processing",
+              "Loan Processing",
+              "Payroll Processing",
+              "Monthly On-Line Use Fee"
+            ]
+          },
+          {
+            "text": "(b) Standard On-Line Reports:",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(c) Standard Off-Line Reports:",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(d) Optional Services:",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(e) Optional Reports:",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(f) Interfaces:",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "2. FEES.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(b) Telecommunication Services.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(c) Optional Services:",
+            "product": null,
+            "items": [
+              "Basic Share Draft Processing",
+              "Expanded General Ledger Processing",
+              "Expanded Member Processing",
+              "Expanded Share Draft Processing",
+              "IRA Processing",
+              "Mortgage Loan Processing",
+              "ACH",
+              "ACH Notification of Change",
+              "ACH NSF Fees and Notices",
+              "ACH NSF History",
+              "ACH On-line Posting",
+              "ACH Pend Feature",
+              "ACH POS Transactions",
+              "ACH Returns",
+              "ACH Stop Payment",
+              "ACH Transactions",
+              "Account Analysis",
+              "1 – 100 Accounts",
+              "Over 100 Accounts",
+              "Aires Download",
+              "ATM Services:",
+              "Automated Network Balancing – Cardholder",
+              "Automatic ATM Card Re-Issue Program",
+              "ATM Cardholder Record",
+              "Debit Cardholder",
+              "Exception Processing for On-Line Network ATMs (settled networks)",
+              "On-Line ATM Card Ordering",
+              "ATM/Debit Temporary Withdrawal Limits, ATM/Debit Holds & To Host Maintenance",
+              "Audio Response",
+              "Audio Sessions",
+              "Authorized User Record",
+              "National Audio Response Center*",
+              "400 Day History",
+              "ACH Courtesy Pay",
+              "Share Draft Courtesy Pay",
+              "Enhanced Courtesy Pay",
+              "Automated CTR Support",
+              "Automatic Closing and Re-opening of Self-Service Tellers",
+              "Cash Control",
+              "Certificate Automatic Rate Change",
+              "Check Protection Feature",
+              "Collection",
+              "Collection Letter Printing",
+              "Credit Bureau Reporting",
+              "Credit Card Payments Supported On-Line",
+              "Data Match",
+              "Dividend Check Printing",
+              "Electronic Teller Journaling",
+              "Enhanced CD On-Line History",
+              "Enhanced Loan On-Line History",
+              "Enhanced Skip Payment",
+              "eReceipts",
+              "Escheat Processing",
+              "Expanded Journal Voucher",
+              "Flexible Fees Program",
+              "Flexible Rewards Program",
+              "Forms Management",
+              "Holiday/Vacation Club Checks/Transfers",
+              "Laser Notices",
+              "Loan Origination Processing",
+              "Loancierge",
+              "Credit Bureau Report Retrieval",
+              "Loan Decision Manager",
+              "Decision Tool Set-up Fee (includes up to 8 Process ID’s)",
+              "Pricing Component Set-up Fee",
+              "Decision Fees (Loancierge & Virtual Branch Lending)",
+              "Re-Decision Fees (Loancierge & Virtual Branch Lending)",
+              "Monthly Hosting",
+              "Risk Based Pricing",
+              "Member Notepad Capability and Reporting",
+              "Member On-line History",
+              "Multiple Statement Sort Options",
+              "Non-Financial History – 365 Days",
+              "Notices Printed by Fiserv",
+              "Postage",
+              "Online Delinquency History",
+              "Online Payroll Posting",
+              "Payroll Transmission",
+              "Positive Payroll Transmission",
+              "Payrolls Transaction",
+              "Payrolls Transmission",
+              "Periodic Address Standardization, Including ZIP+4 Updates and Bar Coding",
+              "Portico Data Download",
+              "Portico User Automation Applications",
+              "Contact Manager",
+              "Cross Sell and Sales Tracking",
+              "DocumentIT (CUNA documents plus 10 additional)",
+              "ID Capture (eFiciency Imaging Interface)",
+              "Member Activity Tracking Setup Fee",
+              "Member Warnings & Alerts Setup Fee",
+              "Teller Automation Platform/New Member Origination",
+              "Relationship Pricing",
+              "Reporting Analytics (2 Admin, 8 Consumer User, 10 Report Author)",
+              "Loancierge Data",
+              "Non-Financial Data",
+              "Virtual Branch Data",
+              "Contact Manager Data",
+              "Cross Sell Data",
+              "Automated Delivery Tool",
+              "Executive Dashboard",
+              "Share Draft & Regular Statements Combined",
+              "Single Interest Insurance",
+              "Statement Message for JV Transactions",
+              "Statement Transmission File",
+              "Teller Administration",
+              "Teller Security System",
+              "Transfer File",
+              "Vehicle Valuator for Credit Unions",
+              "NADA – Subject to the terms of Appendix 1",
+              "Vehicle Valuator Set-up Fee – NADA",
+              "Vehicle Valuator Per Request Fee – NADA",
+              "GAP and MBP Interface (Allied, CUNA, or Frost)",
+              "Workflow Automation Print",
+              "Workflow Processing",
+              "Gateway Access:",
+              "Credit Card Interface:",
+              "Fiserv CPS",
+              "Credit Card Integration for Inquiry Purposes (186/66C Transactions – Payment and Automated Collections)",
+              "Credit Card Daily Activity Report 740",
+              "Credit Card Daily Exception Report 741",
+              "Share Draft Services:",
+              "Mainstreet",
+              "Implementation/Conversion Services*"
+            ]
+          },
+          {
+            "text": "(d) Optional Reports:",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "3. HOURS OF OPERATION.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "4. ADDITIONAL TERMS.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(a) Annual Histories.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(b) Forms and Supplies.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(c) Communication Lines.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(d) Third Parties.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(e) eReceipts.",
+            "product": "eReceipts",
+            "items": []
+          },
+          {
+            "text": "(g) Flex Credit.",
+            "product": "Flex Credit",
+            "items": []
+          },
+          {
+            "text": "(h) Credit.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(i) Fiserv Forum Conferences.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Appendix 1",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Compliance with Law.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "License to Fiserv and Third Party Provider.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Single Sign-On Provisions.",
+            "product": null,
+            "items": [
+              "SSO",
+              "User Data"
+            ]
+          },
+          {
+            "text": "User Data.",
+            "product": null,
+            "items": [
+              "Aggregated Data"
+            ]
+          },
+          {
+            "text": "Cooperation; Feedback.",
+            "product": null,
+            "items": [
+              "Cooperation"
+            ]
+          },
+          {
+            "text": "Disclaimers and Limitations and Liability.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Third Party Beneficiary.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Offers Made Available by Client; Follow Up.",
+            "product": null,
+            "items": [
+              "Offers",
+              "User Offer Data",
+              "User Follow Up Data"
+            ]
+          },
+          {
+            "text": "Analytics Data.",
+            "product": null,
+            "items": [
+              "Analytics Data"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Credit Sense Services Schedule to ASP Services Exhibit",
+        "product": "Credit Sense Services",
+        "subheaders": [
+          {
+            "text": "Term.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Services",
+            "product": null,
+            "items": [
+              "Credit Sense Services",
+              "Credit Sense Score Services",
+              "Credit Sense Analytics Services",
+              "Offers",
+              "Client Site",
+              "Credit Sense Website"
+            ]
+          },
+          {
+            "text": "Fees and Payment.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Support.",
+            "product": null,
+            "items": [
+              "First Level Support"
+            ]
+          },
+          {
+            "text": "Client Responsibilities.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional Terms.",
+            "product": null,
+            "items": []
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "medium",
+    "extraction_confidence_score": 78,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "Account Processing Services Schedule\nto the ASP Services Exhibit",
+      "Appendix 1",
+      "Credit Sense Services Schedule to ASP Services Exhibit"
+    ],
+    "section_header_products": [
+      null,
+      "Account Processing Services",
+      null,
+      "Credit Sense Services"
+    ],
+    "num_pages": 74,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---10-3-2019---1939176.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2019-10-16",
+    "effective_date": "2019-10-03",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (\"Amendment\") dated as of 10/3/9 (\"Amendment Effective Date\") between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 6160 Warren Parkway, Suite 400, Frisco, TX 75034 (\"Fiserv\"), and FiCare Federal Credit Union with offices located at 3001 W. Dr. Martin Luther King, Jr. Blvd., Tampa, FL 33607 (\"Client\"), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\")."
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 46AA91AB-AFB3-44E8-8C1A-9E311103F1D2",
+        "position": "printed_header"
+      },
+      {
+        "value": "Envelope Id: 46AA91ABAFB344E88C1A9E311103F1D2",
+        "position": "printed_body"
+      },
+      {
+        "value": "FiCare FCU\n8366-0008 Portico – Amendment: Core AddOn (CR)",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Account Processing Services Schedule to the ASP Services Exhibit.",
+        "product": "Account Processing Services Schedule to the ASP Services Exhibit",
+        "subheaders": [
+          {
+            "text": "Selected Services and associated fees:",
+            "product": null,
+            "items": [
+              "Portico User Experience"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 92,
+    "section_headers": [
+      "Defined Terms.",
+      "Account Processing Services Schedule to the ASP Services Exhibit.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "Account Processing Services Schedule to the ASP Services Exhibit",
+      null
+    ],
+    "num_pages": 3,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---12-10-2024---3265818.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2024-12-10",
+    "effective_date": null,
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "This AMENDMENT (“Amendment”), effective as of the last date of signature below (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 600 N. Vel R. Phillips Avenue, Milwaukee, WI 53203 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W Dr Martin Luther King Jr Blvd, Tampa, FL 33607-6307 (“Client”), is to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended, the “Agreement”).",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of Products and Services to Client; and",
+      "WHEREAS, Fiserv and Client wish to amend the Agreement to incorporate additional File Exchange Services to the File Exchange Services Schedule to the ASP Services Exhibit (“File Exchange Services Schedule”) as part of the Agreement."
+    ],
+    "supersedes_text": "This Amendment is a modification of the Agreement. Except as expressly modified in this Amendment, the Agreement will remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment will control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: A9DC571C-D0E5-4512-A8C0-9F360BDCCFCE4",
+        "position": "printed_header"
+      },
+      {
+        "value": "Envelope Id: A9DC571C-D0E5-4512-A8C0-9F360BDCCFCE4",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional File Exchange Services.",
+            "product": "File Exchange Services",
+            "items": [
+              "File Exchange Transmission Services Attachment"
+            ]
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "File Exchange Services Schedule",
+        "product": "File Exchange Services Schedule",
+        "subheaders": [
+          {
+            "text": "Term.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Services.",
+            "product": null,
+            "items": [
+              "File Exchange: Transmission Services"
+            ]
+          },
+          {
+            "text": "Fees.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Performance.",
+            "product": null,
+            "items": [
+              "Hours of Operation.",
+              "Customer Technical Support."
+            ]
+          },
+          {
+            "text": "Professional Services.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional Terms.",
+            "product": null,
+            "items": [
+              "Definitions.",
+              "File Exchange Web.",
+              "Fiserv Responsibilities.",
+              "Client Responsibilities.",
+              "Core Account Processing."
+            ]
+          }
+        ]
+      },
+      {
+        "header": "File Exchange: Transmission Services Attachment",
+        "product": "File Exchange: Transmission Services Attachment",
+        "subheaders": [
+          {
+            "text": "File Exchange: Transmission Services.",
+            "product": "File Exchange: Transmission Services",
+            "items": [
+              "File Exchange: Federal Reserve Connect Services.",
+              "File Exchange: Commercial Payment Interface Services.",
+              "File Exchange: Automated EDI Report Delivery Services."
+            ]
+          },
+          {
+            "text": "Fees.",
+            "product": null,
+            "items": [
+              "Implementation Fee.",
+              "File Exchange: Transmission Services One-Time Setup Fee",
+              "File Exchange: Transmission Services Per File Setup Fee",
+              "Monthly Fees Payment (Formatted Data and Pass Through Data).",
+              "Monthly Volume Fees – Formatted Data (Transactions)",
+              "Monthly Volume Fees – Pass Through Data (Per Kilobyte)"
+            ]
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "File Exchange Services Schedule",
+      "File Exchange: Transmission Services Attachment"
+    ],
+    "section_header_products": [
+      null,
+      "File Exchange Services Schedule",
+      "File Exchange: Transmission Services Attachment"
+    ],
+    "num_pages": 9,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---12-9-2021---2840463.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2021-12-09",
+    "effective_date": "2021-12-09",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of December 9, 2021 | 08:24 CST (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, WI 53045 (“Fiserv”), and FiCare Federal Credit Union, with offices located at 3001 W Dr Martin Luther, Tampa, FL 33607 (“Client”), to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”)."
+    ],
+    "supersedes_text": "To the extent a corresponding Exhibit or Schedule to the Agreement already exists, the attached Exhibit or Schedule shall replace and otherwise supersede the existing Exhibit or Schedule in its entirety.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: E83C322D-D6EC-4919-83AA-41BD5DAE3BAF",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare Federal Credit Union- 00178588.0",
+        "position": "printed_footer"
+      },
+      {
+        "value": "8366-0014_Portico_VBnext (JA)",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Additional and Replacement Deliverables.",
+            "product": null,
+            "items": [
+              "Digital Online Banking Services Schedule to the ASP Services Exhibit"
+            ]
+          },
+          {
+            "text": "Virtual Branch Services.",
+            "product": "Virtual Branch Services",
+            "items": [
+              "VB Loan Delivery Services"
+            ]
+          },
+          {
+            "text": "Termination of Deliverables.",
+            "product": null,
+            "items": [
+              "Credit Sense Services Schedule to ASP Services Exhibit",
+              "Mobiliti Services Schedule to ASP Services Exhibit"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Digital Online Banking Services Schedule\nto ASP Services Exhibit",
+        "product": "Digital Online Banking Services",
+        "subheaders": [
+          {
+            "text": "Term.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "General Terms.",
+            "product": null,
+            "items": [
+              "Hours.",
+              "Support.",
+              "Releases.",
+              "Service Providers.",
+              "Client Third Party Service Providers.",
+              "Test Accounts; Telecommunications; VPNs.",
+              "Services.",
+              "Fees."
+            ]
+          },
+          {
+            "text": "Services and Service-specific Terms.",
+            "product": null,
+            "items": [
+              "Digital Online Banking Services.",
+              "Credit Sense Services.",
+              "SecureNow Services.",
+              "Personal Financial Management Services."
+            ]
+          },
+          {
+            "text": "Implementation Services.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Annual Increases.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Attachment 1\nFiCare\nDigital Online Banking Services",
+        "product": "Digital Online Banking Services",
+        "subheaders": [
+          {
+            "text": "Virtual Branch Next Upgrade Onetime",
+            "product": "Virtual Branch Next Upgrade Onetime",
+            "items": [
+              "Monthly Maintenance Fee",
+              "Monthly User Fee"
+            ]
+          },
+          {
+            "text": "Enhanced Authentication",
+            "product": "Enhanced Authentication",
+            "items": [
+              "Implementation",
+              "Annual User Fee"
+            ]
+          },
+          {
+            "text": "CheckFree RXP",
+            "product": "CheckFree RXP",
+            "items": [
+              "Implementation",
+              "Monthly Maintenance"
+            ]
+          },
+          {
+            "text": "Check Image Retrieval",
+            "product": "Check Image Retrieval",
+            "items": [
+              "Implementation",
+              "Monthly Maintenance"
+            ]
+          },
+          {
+            "text": "Credit Card Information System",
+            "product": "Credit Card Information System",
+            "items": [
+              "Implementation",
+              "Monthly Maintenance"
+            ]
+          },
+          {
+            "text": "Online Check Deposit",
+            "product": "Online Check Deposit",
+            "items": [
+              "Implementation",
+              "Monthly Maintenance"
+            ]
+          },
+          {
+            "text": "Account Alerts",
+            "product": "Account Alerts",
+            "items": [
+              "Implementation",
+              "Monthly Maintenance"
+            ]
+          },
+          {
+            "text": "Virtual Branch Forms",
+            "product": "Virtual Branch Forms",
+            "items": [
+              "Basic Forms package"
+            ]
+          },
+          {
+            "text": "Mobile Deposit Monthly Maintenance",
+            "product": "Mobile Deposit Monthly Maintenance",
+            "items": []
+          },
+          {
+            "text": "VB Chat",
+            "product": "VB Chat",
+            "items": [
+              "Implementation Fee",
+              "Monthly Maintenance"
+            ]
+          },
+          {
+            "text": "VB Online Electronic Notices",
+            "product": "VB Online Electronic Notices",
+            "items": [
+              "Implementation Fee",
+              "Monthly Maintenance",
+              "Electronic Notice Alert Fee – per alert sent"
+            ]
+          },
+          {
+            "text": "VB Professional Services",
+            "product": "VB Professional Services",
+            "items": [
+              "Hourly rate - configuration, research or project management services"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Mobiliti Services",
+        "product": "Mobiliti Services",
+        "subheaders": [
+          {
+            "text": "Mobile Banking for Phone – Implementation and Monthly Service Fees.",
+            "product": "Mobile Banking for Phone",
+            "items": [
+              "TouchBanking™-Branded Smartphone App, Mobile Browser and SMS",
+              "Client-Branded Smartphone App."
+            ]
+          },
+          {
+            "text": "User Fees for Phone and/or Tablet.",
+            "product": null,
+            "items": [
+              "Triple Play-SMS, Mobile Browser and DMA",
+              "Monthly Minimum"
+            ]
+          },
+          {
+            "text": "SMS Fees.",
+            "product": "SMS Fees",
+            "items": [
+              "Unbundled Fee Option:"
+            ]
+          },
+          {
+            "text": "Miscellaneous Fees.",
+            "product": null,
+            "items": [
+              "Changes to configured items after initial set-up:"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Credit Sense Services",
+        "product": "Credit Sense Services",
+        "subheaders": []
+      },
+      {
+        "header": "Appendix 1 - Credit Sense Service Provider Terms",
+        "product": "Credit Sense",
+        "subheaders": [
+          {
+            "text": "Compliance with Law.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "License to Fiserv and Service Provider.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Single Sign-On Provisions.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Authentication by Client.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "CS User Data.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Cooperation; Feedback.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Disclaimers and Limitations and Liability.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Third Party Beneficiary.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Offers Made Available by Client; Follow Up.",
+            "product": null,
+            "items": [
+              "Offers.",
+              "User Offer Data.",
+              "User Follow Up Data.",
+              "Minimum Number of Offers."
+            ]
+          },
+          {
+            "text": "Analytics Data.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Appendix 2 – PFM Services Terms and Conditions",
+        "product": "PFM Services",
+        "subheaders": [
+          {
+            "text": "License to Fiserv and Third Party Provider.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Single Sign-On Provisions.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "User Data.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Appendix 3",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "STATEMENT OF WORK",
+            "product": "STATEMENT OF WORK",
+            "items": [
+              "Virtual Branch (VB) Migration to Digital Online Banking Services"
+            ]
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "Digital Online Banking Services Schedule\nto ASP Services Exhibit",
+      "Attachment 1\nFiCare\nDigital Online Banking Services",
+      "Mobiliti Services",
+      "Credit Sense Services",
+      "Appendix 1 - Credit Sense Service Provider Terms",
+      "Appendix 2 – PFM Services Terms and Conditions",
+      "Appendix 3"
+    ],
+    "section_header_products": [
+      null,
+      "Digital Online Banking Services",
+      "Digital Online Banking Services",
+      "Mobiliti Services",
+      "Credit Sense Services",
+      "Credit Sense",
+      "PFM Services",
+      null
+    ],
+    "num_pages": 22,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---2-24-2020---2045280.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2020-02-24",
+    "effective_date": "2020-02-24",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of February 24, 2020 | 08:55 CST (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, Wisconsin 53045 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W. Dr. Martin Luther King Jr. Blvd., Tampa, FL 33607 (“Client”), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”).",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client;",
+      "Account Processing Services Schedule to the ASP Services Exhibit."
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 31B75AEE-94BF-4642-B3FE-5D08224CEAD8",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0010",
+        "position": "printed_footer"
+      },
+      {
+        "value": "Envelope Id: 7940DF6F1F3F48F58B721F8E4B2D4D02",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Account Processing Services Schedule to the ASP Services Exhibit.",
+        "product": "Account Processing Services Schedule to the ASP Services Exhibit",
+        "subheaders": [
+          {
+            "text": "Selected Services",
+            "product": null,
+            "items": [
+              "Flexible Fees Program",
+              "Monthly Fee",
+              "Account Analysis",
+              "1 – 100 Accounts",
+              "Over 100 Accounts"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "Defined Terms.",
+      "Account Processing Services Schedule to the ASP Services Exhibit.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "Account Processing Services Schedule to the ASP Services Exhibit",
+      null
+    ],
+    "num_pages": 8,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---4-26-2019---1770321.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2019-04-26",
+    "effective_date": "2019-04-26",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (\"Amendment\") dated as of 4/26/2019 (\"Amendment Effective Date\") between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 2601 Network Blvd., Suite 600, Frisco, TX 75034 (\"Fiserv\"), and FiCare Federal Credit Union with offices located at 3001 W. Dr. Martin Luther King Jr. Blvd., Tampa, FL 33607 (\"Client\"), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\").",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client; and"
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 2619597D-0AC2-4A87-82C7-D01E9E15D253",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0005",
+        "position": "printed_footer"
+      },
+      {
+        "value": "69C45A0B479042F",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Account Processing Services Schedule to the ASP Services Exhibit.",
+        "product": "Account Processing Services",
+        "subheaders": [
+          {
+            "text": "Selected Services and associated fees:",
+            "product": null,
+            "items": [
+              "Standard SSL Certificate – OV SSL (2 year)",
+              "OV SAN SubDomain",
+              "Portico Professional Services for SSL*",
+              "Training – 1 technician; 3 days (Estimated)",
+              "Conversion – 1 technician; 4 days (Estimated)"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Portico Equipment Schedule to the Equipment Exhibit.",
+        "product": "Portico",
+        "subheaders": [
+          {
+            "text": "Description",
+            "product": null,
+            "items": [
+              "Portico Print Appliance* (additional)"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Master Agreement.",
+        "product": "Master Agreement",
+        "subheaders": []
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 92,
+    "section_headers": [
+      "Defined Terms.",
+      "Account Processing Services Schedule to the ASP Services Exhibit.",
+      "Portico Equipment Schedule to the Equipment Exhibit.",
+      "Master Agreement.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "Account Processing Services",
+      "Portico",
+      "Master Agreement",
+      null
+    ],
+    "num_pages": 2,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---4-28-2023---2893211.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2023-05-04",
+    "effective_date": "2023-04-28",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of 4/28/23 (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, WI 53045 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W Dr Martin Luther King Jr Blvd, Tampa, FL 33607-6307 (“Client”), to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”).",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client; and",
+      "WHEREAS, Fiserv and Client wish to amend the Agreement as set forth below;"
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: E2C1C606-07A9-4031-9BAD-7C4980452667",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare FCU – Agr.00496018.0",
+        "position": "printed_footer"
+      },
+      {
+        "value": "8366-0016 Portico – Amendment: Term Extension (KL)",
+        "position": "printed_footer"
+      },
+      {
+        "value": "Envelope Id: E2C1C60607A940319BAD7C4980452667",
+        "position": "printed_body"
+      },
+      {
+        "value": "Subject: Complete with DocuSign: FiCare FCU_8366-0016_Portico_Extension_Flex Credit",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "1. Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "2. Renewal of Term.",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Online Education Center Services Schedule to the ASP Services Exhibit",
+            "product": "Online Education Center Services",
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "3. Account Processing Services Schedule to the ASP Services Exhibit.",
+        "product": "Account Processing Services",
+        "subheaders": [
+          {
+            "text": "(j) Flex Credit.",
+            "product": "Flex Credit",
+            "items": []
+          },
+          {
+            "text": "(k) Monthly Credit.",
+            "product": "Monthly Credit",
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "4. Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "1. Defined Terms.",
+      "2. Renewal of Term.",
+      "3. Account Processing Services Schedule to the ASP Services Exhibit.",
+      "4. Amendment."
+    ],
+    "section_header_products": [
+      null,
+      null,
+      "Account Processing Services",
+      null
+    ],
+    "num_pages": 4,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---4-28-2023---2893211_2893211.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2023-05-04",
+    "effective_date": "2023-04-28",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of 4/28/23 (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, WI 53045 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W Dr Martin Luther King Jr Blvd, Tampa, FL 33607-6307 (“Client”), to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”).",
+      "Notwithstanding anything to the contrary in Section 8(a) of the ASP Services Exhibit or in any of the Schedules to the Agreement, the parties agree that upon the expiration of the initial term or current renewal term of the Schedules attached to the Agreement, with the exception of the Schedules listed below, as of the Amendment Effective Date (as such term is set forth in the Exhibits and Schedules to the Agreement), the Schedules shall be renewed until September 30, 2029 (the “Renewal Term”).",
+      "Online Education Center Services Schedule to the ASP Services Exhibit",
+      "Account Processing Services Schedule to the ASP Services Exhibit."
+    ],
+    "supersedes_text": null,
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: E2C1C606-07A9-4031-9BAD-7C4980452667",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare FCU – Agr.00496018.0",
+        "position": "printed_footer"
+      },
+      {
+        "value": "8366-0016 Portico – Amendment: Term Extension (KL)",
+        "position": "printed_footer"
+      },
+      {
+        "value": "Envelope Id: E2C1C60607A940319BAD7C4980452667",
+        "position": "printed_body"
+      },
+      {
+        "value": "Subject: Complete with DocuSign: FiCare FCU_8366-0016_Portico_Extension_Flex Credit",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "1. Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "2. Renewal of Term.",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Online Education Center Services Schedule to the ASP Services Exhibit",
+            "product": "Online Education Center Services",
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "3. Account Processing Services Schedule to the ASP Services Exhibit.",
+        "product": "Account Processing Services",
+        "subheaders": [
+          {
+            "text": "(j) Flex Credit.",
+            "product": "Flex Credit",
+            "items": []
+          },
+          {
+            "text": "(k) Monthly Credit.",
+            "product": "Monthly Credit",
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "4. Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "1. Defined Terms.",
+      "2. Renewal of Term.",
+      "3. Account Processing Services Schedule to the ASP Services Exhibit.",
+      "4. Amendment."
+    ],
+    "section_header_products": [
+      null,
+      null,
+      "Account Processing Services",
+      null
+    ],
+    "num_pages": 4,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---4-6-2022---2852626.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2022-04-06",
+    "effective_date": "2022-04-06",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of April 6, 2022 | 13:39 CDT (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, WI 53045 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W Dr Martin Luther, Tampa, FL 33607 (“Client”), to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”).",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client; and",
+      "In the event of termination or non-renewal of this Schedule or the Agreement, Client shall: (a) comply with all applicable laws, including laws governing notification of End Users prior to discontinuation of the use of the Services; and (b) be financially responsible for any transactions returned on any of its End Users’ Deposit Accounts after the termination date, whether or not the returns are proper and timely.",
+      "Client hereby consents to Fiserv’s disclosure of the User Data to certain Fiserv supplier(s) solely in connection with the verification and authentication of the End Users and subject to the terms and conditions of this Schedule and the Agreement.",
+      "Upon the Effective Date of the Agreement to which the Zelle Schedule is attached, or the Effective Date of the Amendment by which such Schedule is added to the Agreement, as applicable, Client shall comply with and be subject to all provisions of: (a) the Zelle Network® Participation Rules (“Zelle Network Rules”) and the other Network Documents (as defined in the Zelle Network Rules), and (b) the NOWSM Network Real-Time Participation Rules (“NOW Network Rules”), each of (a) and (b) as amended from time to time in accordance with the provisions thereof, (c) Applicable Law, and (d) any Network Technical Specifications promulgated by Fiserv, each of (c) and (d) as defined in the NOW Network Rules."
+    ],
+    "supersedes_text": "To the extent a corresponding Exhibit or Schedule to the Agreement already exists, the attached Exhibit or Schedule shall replace and otherwise supersede the existing Exhibit or Schedule in its entirety.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 497B2999-1E9C-42A6-88E5-5D12A1284EA0",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare Federal Credit Union- 00193674.0",
+        "position": "printed_footer"
+      },
+      {
+        "value": "8366-0015 Portico – Zelle (DA)",
+        "position": "printed_footer"
+      },
+      {
+        "value": "Envelope Id: 497B29991E9C42A688E55D12A1284EA0",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "1. Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "2. Additional and Replacement Deliverables.",
+            "product": null,
+            "items": [
+              "Zelle® Payment Services Schedule to ASP Services Exhibit"
+            ]
+          },
+          {
+            "text": "3. Account Processing Services Schedule to the ASP Services Exhibit.",
+            "product": "Account Processing Services",
+            "items": []
+          },
+          {
+            "text": "4. Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Attachment 1 to the Account Processing Services Schedule",
+        "product": "Account Processing Services",
+        "subheaders": [
+          {
+            "text": "Additional Optional Services",
+            "product": null,
+            "items": [
+              "Zelle",
+              "NOW Network Integration and in support of real-time Zelle P2P Payments <100K DDA"
+            ]
+          },
+          {
+            "text": "Fee Attachment Notes",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Zelle® Payment Services Schedule to ASP Services Exhibit",
+        "product": "Zelle® Payment Services Schedule to ASP Services Exhibit",
+        "subheaders": [
+          {
+            "text": "1. Term.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "2. Services.",
+            "product": null,
+            "items": [
+              "Zelle® Person to Person Services.",
+              "Zelle Real-Time Payments."
+            ]
+          },
+          {
+            "text": "(b) Consulting Services.",
+            "product": "Consulting Services",
+            "items": []
+          },
+          {
+            "text": "3. Fees.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "4. Performance.",
+            "product": null,
+            "items": [
+              "End User Technical Support.",
+              "Customer Service Database.",
+              "Current Release."
+            ]
+          },
+          {
+            "text": "5. Risk Management.",
+            "product": null,
+            "items": [
+              "Risk Processes.",
+              "Risk Procedures.",
+              "Access by Client Employees.",
+              "Recovery of Transaction Losses.",
+              "Threatening Conditions."
+            ]
+          },
+          {
+            "text": "6. Additional Terms and Conditions.",
+            "product": null,
+            "items": [
+              "NOW Network Services",
+              "User Data.",
+              "Compliance.",
+              "ACH Rules.",
+              "Required Modifications.",
+              "U.S. Only Services."
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Attachment 1\nREAL-TIME NETWORK PARTICIPATION AGREEMENT",
+        "product": "REAL-TIME NETWORK PARTICIPATION AGREEMENT",
+        "subheaders": [
+          {
+            "text": "1. Authorized Use of the Service.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "2. Fees.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Attachment 2\nFee Exhibit\nto Zelle Payment Services Schedule",
+        "product": "Zelle Payment Services Schedule",
+        "subheaders": [
+          {
+            "text": "1. Zelle Person to Person Services Fees.",
+            "product": "Zelle Person to Person Services Fees",
+            "items": [
+              "Zelle Person to Person Implementation Fees (based on Client’s current level of DDAs).",
+              "NOW Network Connectivity Fee for In-house Fiserv Core Clients:",
+              "Zelle Person to Person Monthly Subscription Fees.",
+              "Zelle Person to Person Usage Fees:"
+            ]
+          },
+          {
+            "text": "2. Additional Fees and Credits:",
+            "product": null,
+            "items": [
+              "Stop Payment – In-Process Transaction Cancellation Fee",
+              "ACH Return, Chargeback or NOC Fees:",
+              "NACHA – Unauthorized Entry Fee",
+              "Payment Investigation/Claims Fee",
+              "New User Enrollment Fee [applied to all End Users upon acceptance of the Zelle Terms of Service, including without limitation previous Popmoney users and net new End Users]",
+              "Incentive credit for each completed Client End User payment transaction sent to a Small Business Customer through the Zelle Network"
+            ]
+          },
+          {
+            "text": "3. Additional Fee Terms.",
+            "product": null,
+            "items": [
+              "Debit Card Services Networks.",
+              "Early Warning.",
+              "NACHA Fees.",
+              "Early Warning Small Business Incentive Fee Credit.",
+              "Real-Time Payments.",
+              "Transaction Fees.",
+              "Pricing Calculation.",
+              "Invoicing.",
+              "Flex Credit."
+            ]
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 92,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "Attachment 1 to the Account Processing Services Schedule",
+      "Zelle® Payment Services Schedule to ASP Services Exhibit",
+      "Attachment 1\nREAL-TIME NETWORK PARTICIPATION AGREEMENT",
+      "Attachment 2\nFee Exhibit\nto Zelle Payment Services Schedule"
+    ],
+    "section_header_products": [
+      null,
+      "Account Processing Services",
+      "Zelle® Payment Services Schedule to ASP Services Exhibit",
+      "REAL-TIME NETWORK PARTICIPATION AGREEMENT",
+      "Zelle Payment Services Schedule"
+    ],
+    "num_pages": 17,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---5-13-2019---1802626.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": null,
+    "effective_date": "2019-05-13",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (\"Amendment\") dated as of 5/13/19 (\"Amendment Effective Date\") between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 2601 Network Blvd., Suite 600, Frisco, TX 75034 (\"Fiserv\"), and FiCare Federal Credit Union with offices located at 3001 W. Dr. Martin Luther King Jr. Blvd., Tampa, FL 33607 (\"Client\"), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\").",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client; and",
+      "WHEREAS, Fiserv and Client wish to amend the Agreement to include additional Deliverables;"
+    ],
+    "supersedes_text": "To the extent a corresponding Exhibit or Schedule to the Agreement already exists, the attached Exhibit or Schedule shall replace and otherwise supersede the existing Exhibit or Schedule in its entirety.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 8188AF5E-F695-4F3A-854A-117C917F3249",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0006",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional and Replacement Deliverables.",
+            "product": null,
+            "items": [
+              "Online Education Center Services Schedule to the ASP Services Exhibit"
+            ]
+          },
+          {
+            "text": "Master Agreement.",
+            "product": "Master Agreement",
+            "items": []
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Online Education Center Services Schedule\nto the ASP Services Exhibit",
+        "product": "Online Education Center Services",
+        "subheaders": [
+          {
+            "text": "Services.",
+            "product": null,
+            "items": [
+              "OEC Video",
+              "OEC Plus",
+              "OEC Pro"
+            ]
+          },
+          {
+            "text": "Fees.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional Provisions.",
+            "product": null,
+            "items": [
+              "Term.",
+              "Technical Support.",
+              "Span of Control."
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Attachment 1",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Fees",
+            "product": null,
+            "items": []
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "medium",
+    "extraction_confidence_score": 78,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "Online Education Center Services Schedule\nto the ASP Services Exhibit",
+      "Attachment 1"
+    ],
+    "section_header_products": [
+      null,
+      "Online Education Center Services",
+      null
+    ],
+    "num_pages": 4,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---5-27-2025---3422472.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2025-05-27",
+    "effective_date": null,
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "This AMENDMENT (“Amendment”), effective as of the last date of signature below (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 600 N. Vel R. Phillips Avenue, Milwaukee, WI 53203 (“Fiserv”), and FiCare Federal Credit Union, with offices located at 3001 W. Dr. Martin Luther King Jr Blvd., Tampa, FL 33607-6307 (“Client”), is to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended, the “Agreement”).",
+      "The Schedule listed below and attached to this Amendment is added to the Agreement for Fiserv’s provision of such Deliverables to Client and will replace and otherwise supersede the existing eFiciency Services Schedule in its entirety.",
+      "This Amendment is a modification of the Agreement.",
+      "Except as expressly modified in this Amendment, the Agreement will remain in full force and effect.",
+      "In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment will control."
+    ],
+    "supersedes_text": "The Schedule listed below and attached to this Amendment is added to the Agreement for Fiserv’s provision of such Deliverables to Client and will replace and otherwise supersede the existing eFiciency Services Schedule in its entirety.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: D63ECE64-4221-4DA3-8219-E4712C30279A",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare Federal Credit Union-00963923.0 (Portico®)",
+        "position": "printed_footer"
+      },
+      {
+        "value": "(KL) IT#8366",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional and Replacement Deliverables.",
+            "product": null,
+            "items": [
+              "Nautilus Essentials Archive Services Schedule to ASP Services Exhibit"
+            ]
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Nautilus Essentials Archive Services Schedule to ASP Services Exhibit",
+        "product": "Nautilus Essentials Archive Services",
+        "subheaders": [
+          {
+            "text": "1. SERVICES.",
+            "product": null,
+            "items": [
+              "Nautilus Essentials Archive Services",
+              "Nautilus Essentials System",
+              "Nautilus Essentials Documents",
+              "Nautilus Essentials Reports"
+            ]
+          },
+          {
+            "text": "2. TERM.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "3. FEES.",
+            "product": null,
+            "items": [
+              "Nautilus Essentials Setup Fee",
+              "Nautilus Essentials Monthly Fee",
+              "Batch Capture Stations",
+              "Storage"
+            ]
+          },
+          {
+            "text": "4. HOURS OF OPERATION.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "5. ADDITIONAL TERMS.",
+            "product": null,
+            "items": [
+              "System Administrator",
+              "Nautilus Essentials System Go-Live",
+              "Remote Training",
+              "User Security Profiles",
+              "Scanning Hardware",
+              "Workstation Hardware",
+              "VPD"
+            ]
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "Nautilus Essentials Archive Services Schedule to ASP Services Exhibit"
+    ],
+    "section_header_products": [
+      null,
+      "Nautilus Essentials Archive Services"
+    ],
+    "num_pages": 7,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---6-18-2021---2813579.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2021-06-18",
+    "effective_date": "2021-06-18",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of June 18, 2021 | 09:19 CDT (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, WI 53045 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W Dr Martin Luther, Tampa, FL 33607 (“Client”), to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”).",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client;"
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 783F5D3A-9BB2-4895-B501-6F4FBB192084",
+        "position": "printed_header"
+      },
+      {
+        "value": "Envelope Id: 783F5D3A9BB24895B5016F4FBB192084",
+        "position": "printed_body"
+      },
+      {
+        "value": "FiCare FCU – Agr.00170663.0",
+        "position": "printed_footer"
+      },
+      {
+        "value": "8366-0013",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Credit Sense Services Schedule to the ASP Services Exhibit.",
+        "product": "Credit Sense Services",
+        "subheaders": [
+          {
+            "text": "Fees",
+            "product": null,
+            "items": [
+              "Implementation Fee"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "eFichency Services Schedule to ASP Services Exhibit.",
+        "product": "eFichency Services",
+        "subheaders": [
+          {
+            "text": "Fees",
+            "product": null,
+            "items": [
+              "Encapture Set-Up Fee, per workstation (1 as of Effective Date)",
+              "Encapture Monthly Fee, per workstation (1 as of Effective Date)"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "Defined Terms.",
+      "Credit Sense Services Schedule to the ASP Services Exhibit.",
+      "eFichency Services Schedule to ASP Services Exhibit.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "Credit Sense Services",
+      "eFichency Services",
+      null
+    ],
+    "num_pages": 3,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---6-25-2019---1834349.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2019-06-25",
+    "effective_date": "2019-06-25",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (\"Amendment\") dated as of 6/25/2019 (\"Amendment Effective Date\") between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 3031 Airpark Drive North, Flint, MI 48507 (\"Fiserv\"), and FiCare Federal Credit Union, with offices located at 3001 Dr. Martin Luther King, Jr., Boulevard, Tampa, FL 33607 (\"Client\"), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\").",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client; and",
+      "WHEREAS, Fiserv and Client wish to amend the Agreement to include additional Deliverables;"
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 508F6A47-C73C-45A4-954E-D33228F43E2E",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0007 XP2-Termination (JW)",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Virtual Branch Services Schedule.",
+        "product": "Virtual Branch Services Schedule",
+        "subheaders": []
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 92,
+    "section_headers": [
+      "Defined Terms.",
+      "Virtual Branch Services Schedule.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "Virtual Branch Services Schedule",
+      null
+    ],
+    "num_pages": 1,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---6-9-2025---3429109.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2025-06-09",
+    "effective_date": "2025-06-09",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "This AMENDMENT (“Amendment”), effective as of the last date of signature below (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 600 N. Vel R. Phillips Avenue, Milwaukee, WI 53203 (“Fiserv”), and FiCare Federal Credit Union, with offices located at 3001 W. Dr. Martin Luther King Jr Blvd., Tampa, FL 33607-6307 (“Client”), is to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended, the “Agreement”).",
+      "Notwithstanding anything to the contrary in the PSPO dated December 7, 2024 for Portico Debt Protection Conversion - New Field and Loancierge Integration or as otherwise set forth in the Agreement, such Professional Services and all fees associated with such project shall terminate in their entirety as of December 7, 2024."
+    ],
+    "supersedes_text": "This Amendment is a modification of the Agreement. Except as expressly modified herein, the Agreement remains in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 5AF05AFE-B417-4F43-8394-308699CDBD12",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare Federal Credit Union-00986547.0 (Portico®) (CW)",
+        "position": "printed_footer"
+      },
+      {
+        "value": "Envelope Id: 5AF05AFE-B417-4F43-8394-308699CDBD12",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "1. Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "2. Termination of Professional Services Purchase Order (“PSPO”).",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "3. Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "1. Defined Terms.",
+      "2. Termination of Professional Services Purchase Order (“PSPO”).",
+      "3. Amendment."
+    ],
+    "section_header_products": [
+      null,
+      null,
+      null
+    ],
+    "num_pages": 5,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---7-17-2019---1836815.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": null,
+    "effective_date": "2019-07-17",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the \"Agreement\")."
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: A1E20DE7-F589-42AC-BE12-B8CD67D96CB1",
+        "position": "printed_header"
+      },
+      {
+        "value": "8366-0007 Portico – Amendment: Core (KL)",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Account Processing Services Schedule to the ASP Services Exhibit.",
+        "product": "Account Processing Services Schedule to the ASP Services Exhibit",
+        "subheaders": [
+          {
+            "text": "Under ‘Vehicle Valuator’ for Credit Unions’:",
+            "product": "Vehicle Valuator",
+            "items": [
+              "Vehicle Valuator Set-up Fee - NADA Specialty",
+              "Vehicle Valuator Per Request Fee - NADA Specialty"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "medium",
+    "extraction_confidence_score": 78,
+    "section_headers": [
+      "Defined Terms.",
+      "Account Processing Services Schedule to the ASP Services Exhibit.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "Account Processing Services Schedule to the ASP Services Exhibit",
+      null
+    ],
+    "num_pages": 1,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---7-28-2020---2076759.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2020-07-28",
+    "effective_date": "2020-07-28",
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "AMENDMENT (“Amendment”) dated as of __________________ (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 255 Fiserv Drive, Brookfield, Wisconsin 53045 (“Fiserv”), and FiCare Federal Credit Union with offices located at 3001 W Dr Martin Luther, Tampa, FL 33607 (“Client”), to the Agreement dated April 29, 2013 between Fiserv and Client (as amended through the date hereof, the “Agreement”).",
+      "WHEREAS, Fiserv and Client entered into the Agreement for Fiserv’s provision of various Services and Products to Client;"
+    ],
+    "supersedes_text": "This Amendment is intended to be a modification of the Agreement. Except as expressly modified herein, the Agreement shall remain in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 94A62E30-F9F5-4BE4-9806-61E092612F76",
+        "position": "printed_header"
+      },
+      {
+        "value": "FiCare FCU – Agr.00138756.0",
+        "position": "printed_footer"
+      },
+      {
+        "value": "8366-0012 Portico – Amendment: Core (KL)",
+        "position": "printed_footer"
+      },
+      {
+        "value": "Envelope Id: 94A62E30F9F54BE4980661E092612F76",
+        "position": "printed_body"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "AMENDMENT TO AGREEMENT",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Account Processing Services Schedule to the ASP Services Exhibit.",
+            "product": "Account Processing Services Schedule to the ASP Services Exhibit",
+            "items": [
+              "Telecommunication Services",
+              "Portico System"
+            ]
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Certificate Of Completion",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "AMENDMENT TO AGREEMENT",
+      "Certificate Of Completion"
+    ],
+    "section_header_products": [
+      null,
+      null
+    ],
+    "num_pages": 3,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---8-19-2020---2079256.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2020-08-19",
+    "effective_date": null,
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare FCU (St. Joseph’s Hospital Credit Union)"
+    ],
+    "parent_references": [
+      "This Amendment between Fiserv Solutions, LLC (“Fiserv”) and FiCare FCU (St. Joseph’s Hospital Credit Union) (“Client”) (“Amendment”) to the Master Agreement dated April 29, 2013, as amended through the date hereof (the “Agreement”) between Fiserv Solutions, Inc. and Client (Fiserv and Client each a “Party” and collectively, the “Parties”) is made effective as of the last signature date below (“Amendment Effective Date”).",
+      "Defined Terms. Except as defined herein or otherwise required by the context herein, all capitalized terms used in this Amendment have the meaning set forth in the Agreement.",
+      "Additional Deliverables. The Schedule listed below and attached hereto is hereby added to the Agreement for Fiserv’s provision of such Deliverables to Client and shall be added to the list set forth in Section 1(a) of the Agreement:",
+      "CheckFree Bill Payment and Delivery Services Schedule to the ASP Services Exhibit",
+      "On the terms and subject to the conditions set forth below, Fiserv and Client hereby enter into this CheckFree Bill Payment and Delivery Services Schedule (this “Schedule”), and agree that this Schedule shall be incorporated into and made subject to the provisions of the Agreement.",
+      "Subject to the terms and conditions of the Agreement, Fiserv grants to Client during the Term a non-exclusive, nontransferable right to display the Popmoney Marks, solely in connection with Client’s use of the Popmoney Service.",
+      "In the event of termination or non-renewal of this Schedule or the Agreement, Client shall: (a) comply with all applicable laws, including laws governing notification of Customers prior to discontinuation of the use of the Services; and (b) be financially responsible for any transactions returned on any of its Customers’ Accounts after the termination date, whether or not the returns are proper and timely.",
+      "Notwithstanding anything in this Schedule or the Agreement, Fiserv has the right to discontinue the Popmoney service upon twelve (12) months notice.",
+      "All Implementation Fees are payable on the date this Schedule is incorporated into the Agreement.",
+      "Notwithstanding anything to the contrary in the Agreement, Client will indemnify, defend, and hold harmless and release Fiserv and its Affiliates and their officers, directors, and employees from and against any claims, actions and other proceedings, damages, liabilities costs, and expenses (including reasonable attorneys’ fees) arising from or related to any breach of the preceding representation and warranty or this Section .2.(a) (Compliance)."
+    ],
+    "supersedes_text": "In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "DocuSign Envelope ID: 1C87A039-2758-4906-A571-AB1B15698572",
+        "position": "printed_header"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "RECITALS",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "TERMS AND CONDITIONS",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "Defined Terms.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "Additional Deliverables.",
+            "product": null,
+            "items": [
+              "CheckFree Bill Payment and Delivery Services Schedule to the ASP Services Exhibit"
+            ]
+          },
+          {
+            "text": "Amendment.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "CheckFree Bill Payment and Delivery Services Schedule to ASP Services Exhibit",
+        "product": "CheckFree Bill Payment and Delivery Services",
+        "subheaders": [
+          {
+            "text": "Services.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "General Bill Delivery and Payment Services Terms.",
+            "product": null,
+            "items": [
+              "Payment Execution",
+              "Method of Payment",
+              "Late Payment Commitment",
+              "Risk of Loss",
+              "Credit Screen",
+              "Threatening Conditions",
+              "Bill Delivery Service",
+              "Overnight Check Service",
+              "Same-Day Bill Payment Service",
+              "Bill Discovery Service",
+              "PFM/Banking Service"
+            ]
+          },
+          {
+            "text": "CheckFree RXP and/or CheckFree Small Business.",
+            "product": "CheckFree RXP and/or CheckFree Small Business",
+            "items": [
+              "Service Description",
+              "Online Education Center",
+              "FraudNet",
+              "Electronic Remittance Services",
+              "Popmoney Third Party Transfer Services"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "(x) Additional Terms and Conditions.",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "A. User Data.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "B. Credentials.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "C. Required Modifications.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "D. U.S. Only Services.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "E. Popmoney Branding.",
+            "product": "Popmoney",
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "(xi) THIRD PARTY TERMS (cannot be modified by Client).",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "A. Third Party Verification and Authentication.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "B. Customer License and Consent.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "(f) A2A Transfer Service.",
+        "product": "A2A Transfer Service",
+        "subheaders": [
+          {
+            "text": "(i) Service Description.",
+            "product": null,
+            "items": [
+              "A2A",
+              "CheckFree RXP"
+            ]
+          },
+          {
+            "text": "(ii) Modifications.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "(g) Customer Care (Care Assist).",
+        "product": "Customer Care (Care Assist)",
+        "subheaders": [
+          {
+            "text": "(i) Definitions.",
+            "product": null,
+            "items": [
+              "Full Service Customer Care",
+              "Back Office Operations Customer Care"
+            ]
+          },
+          {
+            "text": "(ii) Full Service Customer Care.",
+            "product": "Full Service Customer Care",
+            "items": []
+          },
+          {
+            "text": "(iii) Back Office Operations Customer Care.",
+            "product": "Back Office Operations Customer Care",
+            "items": []
+          },
+          {
+            "text": "(iv) Customer Care Systems.",
+            "product": "Customer Care System",
+            "items": []
+          },
+          {
+            "text": "(v) Limitations.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "(h) Implementation and Related Services.",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "(i) Generally.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(ii) Training.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "2. Client Obligations and Responsibilities.",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "(a) Compliance.",
+            "product": null,
+            "items": [
+              "Warranties",
+              "Indemnification",
+              "Records"
+            ]
+          },
+          {
+            "text": "(b) Operating Procedures and Terms of Service.",
+            "product": null,
+            "items": [
+              "Terms of Service",
+              "Sample Terms"
+            ]
+          },
+          {
+            "text": "(c) No Payee Contact; Client Employees.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(d) Payee Data.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(e) Client Site.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(f) Client Content.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(g) Releases.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "3. Fees.",
+        "product": null,
+        "subheaders": [
+          {
+            "text": "(a) Fee Exhibit.",
+            "product": null,
+            "items": []
+          },
+          {
+            "text": "(b) Postage.",
+            "product": null,
+            "items": []
+          }
+        ]
+      },
+      {
+        "header": "Fee Exhibit to CheckFree Bill Payment and Delivery Services Schedule",
+        "product": "CheckFree Bill Payment and Delivery Services Schedule",
+        "subheaders": [
+          {
+            "text": "CHECKFREE RXP – Renewal",
+            "product": "CHECKFREE RXP",
+            "items": [
+              "CheckFree RXP Implementation Fee",
+              "CheckFree RXP Recurring Fees",
+              "Monthly Maintenance Fee",
+              "Enrolled Customer Fee (bundled)",
+              "Per Transaction Fee"
+            ]
+          },
+          {
+            "text": "FraudNet for CheckFree RXP – Renewal",
+            "product": "FraudNet for CheckFree RXP",
+            "items": []
+          },
+          {
+            "text": "Overnight Check – Renewal",
+            "product": "Overnight Check",
+            "items": [
+              "Implementation Fee",
+              "Wholesale Client Transaction Fee"
+            ]
+          },
+          {
+            "text": "Same-Day Bill Payment – Renewal",
+            "product": "Same-Day Bill Payment",
+            "items": [
+              "Implementation Fee",
+              "Wholesale Client Transaction Fee"
+            ]
+          },
+          {
+            "text": "A2A Transfer Service – Renewal",
+            "product": "A2A Transfer Service",
+            "items": [
+              "Implementation Fee",
+              "Wholesale Client Transaction Fee"
+            ]
+          },
+          {
+            "text": "Bill Discovery Services",
+            "product": "Bill Discovery Services",
+            "items": []
+          },
+          {
+            "text": "CHECKFREE SMALL BUSINESS",
+            "product": "CHECKFREE SMALL BUSINESS",
+            "items": [
+              "CheckFree Small Business Set-Up Fee",
+              "CheckFree Small Business Recurring Fees",
+              "Monthly Maintenance Fee",
+              "Enrolled Business Customer (Primary Level 1 Customer)",
+              "Enrolled Business Customer (Secondary Level 2 or Level 3 Customers)",
+              "Per transaction fee (first 10 transactions per month)",
+              "Per transaction fee (additional transactions)",
+              "FraudNet for CheckFree Small Business",
+              "Electronic Remittance Service",
+              "Popmoney Services"
+            ]
+          }
+        ]
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 92,
+    "section_headers": [
+      "RECITALS",
+      "TERMS AND CONDITIONS",
+      "CheckFree Bill Payment and Delivery Services Schedule to ASP Services Exhibit",
+      "(x) Additional Terms and Conditions.",
+      "(xi) THIRD PARTY TERMS (cannot be modified by Client).",
+      "(f) A2A Transfer Service.",
+      "(g) Customer Care (Care Assist).",
+      "(h) Implementation and Related Services.",
+      "2. Client Obligations and Responsibilities.",
+      "3. Fees.",
+      "Fee Exhibit to CheckFree Bill Payment and Delivery Services Schedule"
+    ],
+    "section_header_products": [
+      null,
+      null,
+      "CheckFree Bill Payment and Delivery Services",
+      null,
+      null,
+      "A2A Transfer Service",
+      "Customer Care (Care Assist)",
+      null,
+      null,
+      null,
+      "CheckFree Bill Payment and Delivery Services Schedule"
+    ],
+    "num_pages": 24,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  },
+  "FICARE FCU/FICARE-FEDERAL-CREDIT-UNION---Amendment---9-18-2024---3184846.pdf": {
+    "contract_type": "Amendment",
+    "amendment_number": null,
+    "signed_date": "2024-09-18",
+    "effective_date": null,
+    "parties": [
+      "Fiserv Solutions, LLC",
+      "FiCare Federal Credit Union"
+    ],
+    "parent_references": [
+      "This AMENDMENT (“Amendment”), effective as of the last date of signature below (“Amendment Effective Date”) between Fiserv Solutions, LLC, a Wisconsin limited liability company with offices located at 600 N. Vel R. Phillips Avenue, Milwaukee, WI 53203 (“Fiserv”), and FiCare Federal Credit Union, with offices located at 3001 W Dr Martin Luther King Jr Blvd, Tampa, FL 33607-6307 (“Client”), is to the Master Agreement dated April 29, 2013 between Fiserv and Client (as amended, the “Agreement”)."
+    ],
+    "supersedes_text": "This Amendment is a modification of the Agreement. Except as expressly modified herein, the Agreement remains in full force and effect. In the event of a conflict between the terms of this Amendment and the Agreement, this Amendment shall control.",
+    "internal_doc_codes": [
+      {
+        "value": "Docusign Envelope ID: E46F39BD-42FE-42E5-B4AC-A2B3A7C6AE7B",
+        "position": "printed_header"
+      },
+      {
+        "value": "Envelope Id: E46F39BD42FE42E5B4ACA2B3A7C6AE7B",
+        "position": "printed_body"
+      },
+      {
+        "value": "FiCare FCU #8366-00786743.0 (Portico®) AMD  VB CHAT TERM (CW)",
+        "position": "printed_footer"
+      }
+    ],
+    "section_structure": [
+      {
+        "header": "Defined Terms.",
+        "product": null,
+        "subheaders": []
+      },
+      {
+        "header": "Termination of VB Chat.",
+        "product": "VB Chat",
+        "subheaders": [
+          {
+            "text": "Termination of VB CHAT:",
+            "product": "VB CHAT",
+            "items": [
+              "VB CHAT"
+            ]
+          }
+        ]
+      },
+      {
+        "header": "Amendment.",
+        "product": null,
+        "subheaders": []
+      }
+    ],
+    "is_active": null,
+    "extraction_confidence": "high",
+    "extraction_confidence_score": 95,
+    "section_headers": [
+      "Defined Terms.",
+      "Termination of VB Chat.",
+      "Amendment."
+    ],
+    "section_header_products": [
+      null,
+      "VB Chat",
+      null
+    ],
+    "num_pages": 4,
+    "extraction_failed": false,
+    "parent_rescue_attempted": true,
+    "type_rescue_attempted": true,
+    "doc_codes_format_rescue_attempted": true,
+    "section_structure_rescue_attempted": true
+  }
+}

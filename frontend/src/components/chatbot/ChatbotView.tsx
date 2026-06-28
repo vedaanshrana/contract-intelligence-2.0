@@ -102,7 +102,7 @@ function Bubble({
       >
         {!isUser && (
           <div className="pb-1 font-mono text-[8.5px] uppercase tracking-[0.16em] text-ink-3">
-            Contraxis · Cognitive Engine
+            Billing Intelligence · Cognitive Chat
           </div>
         )}
         {isUser ? (
