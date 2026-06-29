@@ -140,24 +140,39 @@ INVOICE_COLUMNS = [
 # that is the ONLY time we don't pull the full history. Override via env.
 INVOICE_HISTORY_START = os.environ.get("SNOWFLAKE_INVOICE_START_DATE", "2024-01-01")
 
-# SAFETY CEILING ONLY — this is NOT a recent-window cap. The main pull returns
-# the COMPLETE 2024→now history for the client's scope, ordered most-recent
-# first. This ceiling exists solely so a pathological/misconfigured query can't
-# load millions of rows into memory; it is set far above any real client's
-# multi-year line count. Set SNOWFLAKE_MAX_INVOICE_LINES=0 to remove it entirely.
-MAX_INVOICE_LINES = int(os.environ.get("SNOWFLAKE_MAX_INVOICE_LINES", "200000"))
-# When rendering, cap the verbose PER-LINE detail per invoice so a single fat
-# invoice can't crowd out others. The per-invoice TOTALS line and the complete
-# "all material codes on this invoice" list are emitted IN FULL regardless of
-# this cap, and the BILLING HISTORY SUMMARY (per-year + per-code rollups) and
-# grand total are computed over the COMPLETE fetched dataset — so nothing is
-# hidden from aggregate answers, only the line-by-line dump is sampled.
-MAX_LINES_PER_INVOICE = int(os.environ.get("SNOWFLAKE_LINES_PER_INVOICE", "25"))
-# How many distinct invoice documents get a full per-invoice block. Raised from
-# the old recent-window default of 20 to cover a client's full multi-year
-# history. Any overflow beyond this is still fully represented in the per-year
-# coverage summary, the complete per-code billing rollup, and the grand total.
-MAX_INVOICES_IN_CONTEXT = int(os.environ.get("SNOWFLAKE_INVOICES_PER_CLIENT", "150"))
+# SAFETY CEILING for the FETCH only — NOT a recent-window cap and NOT what
+# drives the prompt size. We pull the COMPLETE 2024→now history (every line in
+# the date window) into a DataFrame, then AGGREGATE it in Python before any of
+# it reaches the LLM — so the row count does not inflate the chat request. This
+# ceiling exists solely so a pathological query can't load an absurd number of
+# rows into memory. A typical client is ~6k rows; 100k is far above that. Set
+# SNOWFLAKE_MAX_INVOICE_LINES=0 to disable.
+MAX_INVOICE_LINES = int(os.environ.get("SNOWFLAKE_MAX_INVOICE_LINES", "100000"))
+
+# ── PROMPT-SIZE CONTROLS — decoupled from the fetch. ───────────────────────────
+# The gateway 429 ("too many requests") was caused by rendering thousands of raw
+# invoice lines into one chat request. The fix is to send the LLM COMPACT but
+# COMPLETE aggregates (per-year + per-code rollups computed over the FULL
+# dataset) plus only a SMALL sample of recent raw lines. The caps below bound the
+# prompt no matter how many rows were fetched, so 400 rows and 60,000 rows
+# produce a similarly-sized request.
+#
+# Raw per-line detail is a SAMPLE for "show me the actual line items" questions
+# only. Completeness for aggregate questions comes from the rollups + the direct
+# invoice-number / material-code lookups (which hit full history on demand).
+MAX_LINES_PER_INVOICE = int(os.environ.get("SNOWFLAKE_LINES_PER_INVOICE", "10"))
+MAX_INVOICES_IN_CONTEXT = int(os.environ.get("SNOWFLAKE_INVOICES_PER_CLIENT", "10"))
+# How many distinct material codes the COMPLETE per-code rollup may list (one
+# line per code — the authoritative "what was billed" view). High enough to
+# cover a real client's whole code universe; any overflow is explicitly noted.
+SUMMARY_MAX_CODES = int(os.environ.get("SNOWFLAKE_SUMMARY_MAX_CODES", "600"))
+# Hard backstop on the character length of the entire invoice context block, so
+# a multi-client turn can't assemble an oversized request. Aggregates are emitted
+# first and always survive; only the trailing raw-line sample is trimmed. ~4
+# chars/token → 90k chars ≈ ~22k tokens for the invoice block, which is close to
+# the known-good 400-row request size yet (thanks to aggregation) carries the
+# COMPLETE history. Raise it if your gateway has more headroom.
+MAX_CONTEXT_CHARS = int(os.environ.get("SNOWFLAKE_MAX_CONTEXT_CHARS", "90000"))
 # How many invoice-document numbers will we try to look up directly when they
 # appear in the user's question. SAP doc numbers are usually 8 digits.
 MAX_DIRECT_INVOICE_LOOKUPS = int(os.environ.get("SNOWFLAKE_MAX_DIRECT_LOOKUPS", "10"))
@@ -929,6 +944,81 @@ def fetch_invoice_lines(scope, cfg: dict,
     return df[INVOICE_COLUMNS]
 
 
+def _completeness_note(scope: dict, cfg: dict, info: dict,
+                       date_from: Optional[str], date_to: Optional[str],
+                       n_pulled: int) -> str:
+    """Prove the pull was complete instead of assuming it. Runs ONE COUNT query
+    over the SAME scope and reports, in-band:
+
+      • total lines ever billed to this scope (all-time),
+      • how many fall inside the date window,
+      • how many were actually pulled,
+      • how many have an UNPARSEABLE date (so they're invisible to the window),
+      • how many are dated OUTSIDE the window (e.g. pre-2024).
+
+    If the pulled count equals the in-window count, completeness is verified. If
+    it's short, the safety ceiling was hit and we say so LOUDLY — turning the one
+    possible silent miss into a visible warning. Returns '' on any error;
+    diagnostics must never break the chat."""
+    try:
+        scope_col = scope.get("col")
+        vals = list(scope.get("values") or [])
+        if not scope_col or not vals or not _IDENT_RE.match(str(scope_col)):
+            return ""
+        date_col = _actual_col(_SORT_COLUMN, info)
+        tbl = _qualified_table(cfg)
+        ph = ", ".join(["%s"] * len(vals))
+        params: list = []
+        if date_col:
+            win_pred = f"TRY_TO_DATE({date_col}::STRING) >= TO_DATE(%s)"
+            params.append(str(date_from or INVOICE_HISTORY_START))
+            if date_to:
+                win_pred += f" AND TRY_TO_DATE({date_col}::STRING) <= TO_DATE(%s)"
+                params.append(str(date_to))
+            select = (f"SELECT COUNT(*) AS total_all, "
+                      f"COUNT_IF({win_pred}) AS in_window, "
+                      f"COUNT_IF(TRY_TO_DATE({date_col}::STRING) IS NULL) AS undated ")
+        else:
+            select = "SELECT COUNT(*) AS total_all, COUNT(*) AS in_window, 0 AS undated "
+        params += [str(v) for v in vals]
+        sql = select + f"FROM {tbl} WHERE {scope_col} IN ({ph})"
+        conn = _get_connection()
+        cur = conn.cursor()
+        cur.execute(sql, tuple(params))
+        row = cur.fetchone() or (0, 0, 0)
+        total_all = int(row[0] or 0)
+        in_window = int(row[1] or 0)
+        undated = int(row[2] or 0)
+    except Exception:
+        return ""
+
+    parts = [f"  COMPLETENESS CHECK (SAP COUNT(*) over the same scope): "
+             f"{total_all:,} line(s) ever billed to this scope; {in_window:,} "
+             f"in the window; {n_pulled:,} pulled into this context."]
+    if n_pulled >= in_window:
+        parts.append("  ✓ VERIFIED COMPLETE: every in-window line was pulled — "
+                     "nothing truncated. The aggregates below cover 100% of the "
+                     "window.")
+    else:
+        parts.append(
+            f"  ⚠ TRUNCATED: {in_window - n_pulled:,} in-window line(s) were NOT "
+            f"pulled — the safety ceiling MAX_INVOICE_LINES={MAX_INVOICE_LINES:,} "
+            "was hit. Set env SNOWFLAKE_MAX_INVOICE_LINES higher to capture all; "
+            "until then the aggregates cover only the pulled subset. TELL THE "
+            "USER the data was truncated.")
+    if undated:
+        parts.append(
+            f"  ℹ {undated:,} line(s) in scope have an unparseable invoice date, "
+            "so they fall outside the date window (not in the counts above).")
+    pre_window = total_all - in_window - undated
+    if pre_window > 0:
+        parts.append(
+            f"  ℹ {pre_window:,} line(s) are dated OUTSIDE the window (e.g. before "
+            f"{date_from or INVOICE_HISTORY_START}); ask with an explicit year to "
+            "include them.")
+    return "\n".join(parts)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 4b. DIRECT invoice-number lookup
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1578,6 +1668,12 @@ def build_invoice_context(client_names: list[str], question: str = "",
             f"line(s) across {n_docs} invoice document(s) — no recent-window "
             f"row cap; every line in this date range is included.")
 
+        # Prove it: a COUNT(*) over the same scope confirms nothing was dropped
+        # (and loudly flags the only way it could be — hitting the safety ceiling).
+        note = _completeness_note(scope, cfg, schema_info, date_from, date_to, len(inv))
+        if note:
+            blocks.append(note)
+
         # Per-year coverage + complete per-code rollup over the FULL dataset, so
         # aggregate answers reflect every year — not just the rendered sample.
         blocks.append(_render_history_summary(inv))
@@ -1757,7 +1853,24 @@ def build_invoice_context(client_names: list[str], question: str = "",
             "contract data only and note that invoice data could not be "
             "matched.)")
 
-    return "\n".join(blocks)
+    out = "\n".join(blocks)
+
+    # Final backstop: never hand the LLM an oversized invoice block (the cause of
+    # the gateway 429). The aggregates (per-year + per-code rollups) come first
+    # and survive; only the trailing raw per-line sample is trimmed. Cut on a
+    # line boundary so we don't leave a half-written row.
+    if MAX_CONTEXT_CHARS and len(out) > MAX_CONTEXT_CHARS:
+        cut = out.rfind("\n", 0, MAX_CONTEXT_CHARS)
+        if cut <= 0:
+            cut = MAX_CONTEXT_CHARS
+        out = out[:cut] + (
+            "\n\n  [INVOICE CONTEXT TRIMMED to fit the model's request budget. "
+            "The BILLING HISTORY SUMMARY (per-year + per-code) and reconciliation "
+            "above are COMPLETE over the full date window — only the trailing raw "
+            "per-line sample was cut. For specific older invoices, ask by invoice "
+            "number or material code; those are looked up directly over full "
+            "history.]")
+    return out
 
 
 # ── Rendering helpers ─────────────────────────────────────────────────────────
@@ -1903,7 +2016,7 @@ def _summarize_material_hits(code: str, df: pd.DataFrame) -> str:
             f"e.g. {'; '.join(examples)}{more}")
 
 
-def _render_history_summary(inv: pd.DataFrame, max_codes: int = 500) -> str:
+def _render_history_summary(inv: pd.DataFrame, max_codes: int = SUMMARY_MAX_CODES) -> str:
     """Compact, COMPLETE rollups over the ENTIRE fetched dataset (the whole
     date window), so aggregate questions are answerable even though the per-line
     detail further below is sampled:
@@ -2095,7 +2208,16 @@ def _render_invoice_lines(inv: pd.DataFrame,
     if max_invoices is None:
         max_invoices = MAX_INVOICES_IN_CONTEXT
 
-    lines = ["\n  === INVOICE LINE DETAIL ==="]
+    lines = ["\n  === INVOICE LINE DETAIL (recent sample — NOT the full dataset) ==="]
+    lines.append(
+        "  IMPORTANT: this is a SAMPLE of the most recent invoices, shown so you "
+        "can answer line-level detail / 'show me recent invoices' questions. It "
+        "is NOT the complete history. For totals, counts, date ranges, and which "
+        "material codes were billed, use the COMPLETE 'BILLING HISTORY SUMMARY' "
+        "(per-year + per-code) and 'GRAND TOTAL' above — those cover every line "
+        "in the window. For a specific older invoice or code not shown here, it "
+        "is fetched directly on request (by invoice number or material code)."
+    )
     lines.append(
         "  When citing one of these invoices in Sources, use this EXACT form:\n"
         "    [INVOICE] <doc> — <URL from the 'URL:' line below>\n"

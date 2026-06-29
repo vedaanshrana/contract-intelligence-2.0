@@ -160,12 +160,18 @@ def reset() -> None:
 
 # ── Cost ──────────────────────────────────────────────────────────────────────
 def cost_for_run(rec: dict) -> float:
-    """USD cost of a single run record, summed per model from MODEL_PRICING.
+    """USD cost of a single run record, computed from the tokens and the ACTUAL
+    model recorded in run_metrics — nothing else.
 
-    Prefers the `per_model` token breakdown (different agents — and even calls
-    within one agent — can hit different models). Falls back to the aggregate
-    input/output_tokens against the record's `model` label for older records
-    that predate per_model. Models with no price match contribute $0."""
+    Resolution order:
+      1. `per_model` token breakdown — each bucket is keyed on the actual model
+         the API served, so cost = Σ(input/1e6·in_price + output/1e6·out_price)
+         per model. This is the normal path and always reflects current
+         MODEL_PRICING (so editing a price updates the figure immediately).
+      2. A persisted `cost_usd` field — for legacy records that have no
+         per_model breakdown but were stamped with a cost.
+      3. The aggregate input/output_tokens against the record's `model` label.
+    Models with no price match contribute $0 (add them to MODEL_PRICING)."""
     per_model = rec.get("per_model") or {}
     if per_model:
         total = 0.0
@@ -174,9 +180,27 @@ def cost_for_run(rec: dict) -> float:
             total += (bucket.get("input", 0) or 0) / 1_000_000 * in_p
             total += (bucket.get("output", 0) or 0) / 1_000_000 * out_p
         return total
+    cu = rec.get("cost_usd")
+    if isinstance(cu, (int, float)):
+        return float(cu)
     in_p, out_p = price_for_model(rec.get("model", ""))
     return ((rec.get("input_tokens", 0) or 0) / 1_000_000 * in_p
             + (rec.get("output_tokens", 0) or 0) / 1_000_000 * out_p)
+
+
+def cost_breakdown(rec: dict) -> dict:
+    """Per-model USD cost for one run, e.g.
+    {"gpt-5.2-2025-12-11": 1.2572, "gpt-4o-mini-2024-07-18": 0.0014}.
+
+    Mirrors cost_for_run's per-model path so the persisted record carries a
+    human-readable cost map alongside the total. Empty when no per_model data."""
+    out: dict[str, float] = {}
+    for name, bucket in (rec.get("per_model") or {}).items():
+        in_p, out_p = price_for_model(name)
+        c = ((bucket.get("input", 0) or 0) / 1_000_000 * in_p
+             + (bucket.get("output", 0) or 0) / 1_000_000 * out_p)
+        out[name] = round(c, 6)
+    return out
 
 
 # ── Persistence (one JSON file per client) ────────────────────────────────────
@@ -226,6 +250,11 @@ def log_run(client: str, agent: str, display: str, runtime_s: float,
         "status":       status,
         "per_model":    per_model or {},
     }
+    # Stamp the USD cost into the record itself (from this run's tokens × the
+    # actual model's price) so run_metrics.json is self-describing and the
+    # frontend total is just a sum of these per-agent costs.
+    rec["cost_breakdown"] = cost_breakdown(rec)
+    rec["cost_usd"]       = round(cost_for_run(rec), 6)
     p = _metrics_path(client)
     p.parent.mkdir(parents=True, exist_ok=True)
     data = load_runs(client)
@@ -262,3 +291,36 @@ def finalize(client: str, agent: str, display: str, t0: float, mark: int,
                   per_model=per_model)
     reset()
     return rec
+
+
+# ── Backfill (stamp cost into existing run_metrics.json files) ─────────────────
+def backfill_costs(verbose: bool = True) -> dict[str, float]:
+    """(Re)compute and persist `cost_usd` + `cost_breakdown` on every record in
+    every Output/<client>/run_metrics.json. Idempotent — safe to re-run after
+    editing MODEL_PRICING. Returns {client: total_cost}."""
+    totals: dict[str, float] = {}
+    for p in sorted(OUTPUT_DIR.glob("*/run_metrics.json")):
+        client = p.parent.name
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except Exception as e:
+            if verbose:
+                print(f"  skip {client}: unreadable ({e})")
+            continue
+        for rec in data:
+            rec["cost_breakdown"] = cost_breakdown(rec)
+            rec["cost_usd"]       = round(cost_for_run(rec), 6)
+        p.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        latest: dict[str, dict] = {}
+        for rec in data:
+            latest[rec.get("agent", "")] = rec
+        totals[client] = round(sum(r["cost_usd"] for r in latest.values()), 4)
+        if verbose:
+            print(f"  {client:42s} records={len(data):>3}  "
+                  f"latest-run total=${totals[client]}")
+    return totals
+
+
+if __name__ == "__main__":
+    print("Backfilling cost_usd into run_metrics.json files…")
+    backfill_costs()

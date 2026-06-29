@@ -139,7 +139,7 @@ def get_config():
             config.CHAT_MODEL, config.HIERARCHY_MODEL, config.EXTRACTION_MODEL,
             config.MATCHING_MODEL, config.CPI_MODEL, config.MASTER_CONTRACT_MODEL,
             config.SCOPE_AGENT_MODEL, "gpt-4o-mini", "gpt-4.1-2025-04-14",
-            "gpt-5.2", "gpt-5.2-2025-12-11",
+            "gpt-5.2", "gpt-5.2-2025-12-11", "gpt-5.4-2026-03-05",
         ],
         "agents": [{"key": k, "display": d} for k, d in ar.FRONTEND_AGENTS],
     }

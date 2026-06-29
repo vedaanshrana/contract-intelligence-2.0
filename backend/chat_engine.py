@@ -4,7 +4,15 @@ Wraps the Chat Completions API with a rich system prompt built from
 client-specific contract context and the FD306 knowledge base.
 """
 
+import os
+import time
+
 from fiserv_client import make_client
+
+# Retry budget for the interactive chat call on gateway 429 / transient network
+# errors. Kept modest so the user isn't left waiting too long; backoff is
+# 5s, 10s, 20s for rate-limits (2s, 4s, 8s for network blips).
+_CHAT_MAX_RETRIES = int(os.environ.get("CHAT_MAX_RETRIES", "4"))
 
 # ── System prompt template ─────────────────────────────────────────────────────
 
@@ -288,10 +296,35 @@ class ChatEngine:
         Returns the assistant's reply as a string.
         """
         full_messages = [{"role": "system", "content": system_prompt}] + messages
-        resp = self._client.chat.completions.create(
-            model=self.model,
-            messages=full_messages,
-            temperature=0.2,
-            max_tokens=2048,
-        )
-        return resp.choices[0].message.content
+        # The Fiserv Foundation gateway 429s ("too many requests") under load —
+        # every other LLM caller in this codebase wraps its create() in backoff;
+        # the chat engine did not, so a single transient 429 killed the answer.
+        # Retry with exponential backoff on rate-limit / transient network
+        # errors. (Hard "prompt too large" 429s are prevented upstream by the
+        # aggregated, size-bounded invoice context — those wouldn't recover from
+        # a retry anyway.)
+        last_err: Exception | None = None
+        for attempt in range(_CHAT_MAX_RETRIES):
+            try:
+                resp = self._client.chat.completions.create(
+                    model=self.model,
+                    messages=full_messages,
+                    temperature=0.2,
+                    max_tokens=2048,
+                )
+                return resp.choices[0].message.content
+            except Exception as e:                       # noqa: BLE001
+                last_err = e
+                msg = str(e).lower()
+                is_rate = ("429" in str(e) or "rate" in msg
+                           or "too many requests" in msg)
+                is_net = any(k in msg for k in (
+                    "connection", "timeout", "timed out", "remotedisconnected",
+                    "apiconnection", "read timed out", "ssl", "broken pipe",
+                    "reset by peer",
+                ))
+                if attempt == _CHAT_MAX_RETRIES - 1 or not (is_rate or is_net):
+                    raise
+                time.sleep((5 if is_rate else 2) * (2 ** attempt))
+        # Unreachable (loop either returns or raises) — satisfies type checkers.
+        raise last_err if last_err else RuntimeError("chat failed")

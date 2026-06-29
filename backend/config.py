@@ -136,6 +136,7 @@ OPENAI_BACKEND = (os.environ.get("OPENAI_BACKEND") or "openai").lower()
 # matches no key contributes $0 (and should be added below).
 #                  (input_per_1M, output_per_1M)
 MODEL_PRICING: dict[str, tuple[float, float]] = {
+    "gpt-5.4":      (2.50, 15.00),
     "gpt-5.2":      (1.75, 14.00),
     "gpt-5.1":      (1.25, 10.00),
     "gpt-4.1-mini": (0.40,  1.60),
