@@ -133,15 +133,31 @@ INVOICE_COLUMNS = [
     "OTC_SIH_INVOICE_URL",
 ]
 
-# How many invoice lines to pull per engagement (most recent first). Keeps the
-# query bounded and the chat context within token limits.
-MAX_INVOICE_LINES = int(os.environ.get("SNOWFLAKE_MAX_INVOICE_LINES", "400"))
-# When rendering, cap lines PER INVOICE so a single fat invoice with hundreds
-# of lines can't crowd out smaller invoices in the LLM context. This was
-# previously a global `head(60)` which silently hid every invoice past the
-# first one when that first invoice exceeded the cap.
-MAX_LINES_PER_INVOICE = int(os.environ.get("SNOWFLAKE_LINES_PER_INVOICE", "15"))
-MAX_INVOICES_IN_CONTEXT = int(os.environ.get("SNOWFLAKE_INVOICES_PER_CLIENT", "20"))
+# Date floor for the MAIN scoped invoice pull. By default the chatbot looks at
+# the COMPLETE invoice history from this date through "now" (no upper bound) for
+# the focused client — it is NOT a recent-N-row window. A question that names an
+# explicit year/date (e.g. "2026", "in 2025") narrows the window to that slice;
+# that is the ONLY time we don't pull the full history. Override via env.
+INVOICE_HISTORY_START = os.environ.get("SNOWFLAKE_INVOICE_START_DATE", "2024-01-01")
+
+# SAFETY CEILING ONLY — this is NOT a recent-window cap. The main pull returns
+# the COMPLETE 2024→now history for the client's scope, ordered most-recent
+# first. This ceiling exists solely so a pathological/misconfigured query can't
+# load millions of rows into memory; it is set far above any real client's
+# multi-year line count. Set SNOWFLAKE_MAX_INVOICE_LINES=0 to remove it entirely.
+MAX_INVOICE_LINES = int(os.environ.get("SNOWFLAKE_MAX_INVOICE_LINES", "200000"))
+# When rendering, cap the verbose PER-LINE detail per invoice so a single fat
+# invoice can't crowd out others. The per-invoice TOTALS line and the complete
+# "all material codes on this invoice" list are emitted IN FULL regardless of
+# this cap, and the BILLING HISTORY SUMMARY (per-year + per-code rollups) and
+# grand total are computed over the COMPLETE fetched dataset — so nothing is
+# hidden from aggregate answers, only the line-by-line dump is sampled.
+MAX_LINES_PER_INVOICE = int(os.environ.get("SNOWFLAKE_LINES_PER_INVOICE", "25"))
+# How many distinct invoice documents get a full per-invoice block. Raised from
+# the old recent-window default of 20 to cover a client's full multi-year
+# history. Any overflow beyond this is still fully represented in the per-year
+# coverage summary, the complete per-code billing rollup, and the grand total.
+MAX_INVOICES_IN_CONTEXT = int(os.environ.get("SNOWFLAKE_INVOICES_PER_CLIENT", "150"))
 # How many invoice-document numbers will we try to look up directly when they
 # appear in the user's question. SAP doc numbers are usually 8 digits.
 MAX_DIRECT_INVOICE_LOOKUPS = int(os.environ.get("SNOWFLAKE_MAX_DIRECT_LOOKUPS", "10"))
@@ -825,10 +841,24 @@ def resolve_scope(client_name: str, cfg: dict, info: dict, log=None) -> Optional
 # ─────────────────────────────────────────────────────────────────────────────
 # 4.  Pull invoice lines for the resolved bill-to code(s).
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_invoice_lines(billto_codes: list[str], cfg: dict,
-                        limit: int = MAX_INVOICE_LINES) -> pd.DataFrame:
-    """Pull the important invoice columns for the given bill-to code(s),
-    most-recent first. Parameterised query (codes are data, not identifiers).
+def fetch_invoice_lines(scope, cfg: dict,
+                        date_from: Optional[str] = INVOICE_HISTORY_START,
+                        date_to: Optional[str] = None,
+                        limit: Optional[int] = MAX_INVOICE_LINES) -> pd.DataFrame:
+    """Pull the important invoice columns for a resolved client SCOPE, over the
+    COMPLETE history in the date window, most-recent first.
+
+    ``scope`` is the descriptor returned by :func:`resolve_scope`
+    (``{col, values, kind, label}`` — SOLD-TO preferred, bill-to fallback). A
+    bare list of bill-to codes is also accepted for backwards compatibility and
+    is treated as a bill-to scope.
+
+    Date window — by default ``date_from`` is 2024-01-01 and ``date_to`` is open
+    (everything up to today). This is a WINDOW filter, NOT a recent-N-row cap:
+    every line in the window is returned. ``limit`` is only a runaway-query
+    safety ceiling (default very high; 0/None disables it). This is the fix for
+    the old ``ORDER BY date DESC LIMIT 400`` path, which surfaced only the most
+    recent ~400 lines (all from the current year) and hid the rest.
 
     Schema-aware: only SELECTs columns that actually exist in the live view,
     transparently aliases known variants (e.g. SIL↔SIH prefix swaps), and pads
@@ -836,8 +866,20 @@ def fetch_invoice_lines(billto_codes: list[str], cfg: dict,
     rendering helpers, reconciliation, the UI) never branches on whether a
     column is present. This is what stops a single wrong column name from
     killing the entire 23-column SELECT with a generic SQL compilation error.
+
+    The date filter uses ``TRY_TO_DATE`` so a string-typed date column compares
+    correctly (same pattern the Material Validation agent uses) and is simply
+    skipped when the view has no usable date column.
     """
-    if not billto_codes:
+    # Normalise scope: accept a scope dict (preferred) or a list of bill-to
+    # codes (legacy). Either way we end up with a safe column + value list.
+    if isinstance(scope, dict):
+        scope_col = scope.get("col") or "OTC_SIH_BILLTO"
+        scope_vals = list(scope.get("values") or [])
+    else:
+        scope_col = "OTC_SIH_BILLTO"
+        scope_vals = list(scope or [])
+    if not scope_vals:
         return pd.DataFrame(columns=INVOICE_COLUMNS)
 
     info = _discover_columns(cfg)
@@ -847,18 +889,36 @@ def fetch_invoice_lines(billto_codes: list[str], cfg: dict,
             + ", ".join(info["missing_required"])
             + ". Cannot run the invoice query.")
 
+    # The scope column is an identifier (interpolated, not bound). resolve_scope
+    # only ever returns columns it discovered in the view, but validate anyway so
+    # a bad caller can't inject SQL.
+    if not _IDENT_RE.match(str(scope_col)):
+        raise RuntimeError(f"Unsafe scope column {scope_col!r} for invoice query.")
+
     select_parts = [_select_expr_for(c, info) for c in info["present"]]
     tbl = _qualified_table(cfg)
     cols_sql = ", ".join(select_parts)
-    placeholders = ", ".join(["%s"] * len(billto_codes))
+    placeholders = ", ".join(["%s"] * len(scope_vals))
+    params: list = [str(v) for v in scope_vals]
+
+    where_parts = [f"{scope_col} IN ({placeholders})"]
+    date_col = _actual_col(_SORT_COLUMN, info)
+    if date_col and date_from:
+        where_parts.append(f"TRY_TO_DATE({date_col}::STRING) >= TO_DATE(%s)")
+        params.append(str(date_from))
+    if date_col and date_to:
+        where_parts.append(f"TRY_TO_DATE({date_col}::STRING) <= TO_DATE(%s)")
+        params.append(str(date_to))
+
     order_clause = (f"ORDER BY {_SORT_COLUMN} DESC " if info["can_sort"] else "")
+    limit_clause = f"LIMIT {int(limit)}" if (limit and int(limit) > 0) else ""
     sql = (f'SELECT {cols_sql} FROM {tbl} '
-           f'WHERE OTC_SIH_BILLTO IN ({placeholders}) '
+           f'WHERE {" AND ".join(where_parts)} '
            f'{order_clause}'
-           f'LIMIT {int(limit)}')
+           f'{limit_clause}')
     conn = _get_connection()
     cur = conn.cursor()
-    cur.execute(sql, tuple(billto_codes))
+    cur.execute(sql, tuple(params))
     rows = cur.fetchall()
     df = pd.DataFrame(rows, columns=info["present"])
     # Pad columns that don't exist in this view so the rest of the module sees
@@ -1335,6 +1395,37 @@ _ERR_QUOTE_INSTRUCTION = (
 )
 
 
+# A standalone 4-digit calendar year (2000–2099) NOT embedded in a longer digit
+# run — so an 8-digit invoice document number or a dollar amount can't be
+# mistaken for a year. Used to decide whether the user asked about a specific
+# slice of time vs. the default full 2024→now history.
+_YEAR_RE = re.compile(r"(?<!\d)(20\d{2})(?!\d)")
+
+
+def _extract_date_window(question: str) -> tuple[Optional[str], Optional[str]]:
+    """Decide the date window for the MAIN scoped invoice pull.
+
+    Default (no explicit year in the question) → ``(INVOICE_HISTORY_START, None)``:
+    the COMPLETE history from 2024-01-01 through today. This is the behaviour the
+    user wants for "any normal question" — never just the most recent rows.
+
+    When the question names explicit year(s) (e.g. "2026", "in 2025", "between
+    2024 and 2025") the window narrows to span those years — the ONLY case where
+    we don't pull the full 2024→now history. An explicitly-named earlier year
+    (e.g. "2022") overrides the 2024 floor so deliberate historical questions
+    still work.
+
+    Returns ``(date_from, date_to)`` as ISO strings (date_to may be None = open
+    upper bound = today)."""
+    if not question:
+        return INVOICE_HISTORY_START, None
+    years = sorted({int(y) for y in _YEAR_RE.findall(question)
+                    if 2000 <= int(y) <= 2099})
+    if years:
+        return f"{years[0]}-01-01", f"{years[-1]}-12-31"
+    return INVOICE_HISTORY_START, None
+
+
 def build_invoice_context(client_names: list[str], question: str = "",
                           suppress_contract_only: bool = False) -> str:
     """Return a chat-ready INVOICE context block for the focused client(s).
@@ -1416,53 +1507,80 @@ def build_invoice_context(client_names: list[str], question: str = "",
                          + ", ".join(schema_info["missing"]))
         blocks.append("(schema notes — " + " | ".join(notes) + ")")
 
+    # Date window for the MAIN scoped pull. Default = the COMPLETE history from
+    # INVOICE_HISTORY_START (2024-01-01) through today; narrowed ONLY when the
+    # question explicitly names a year/date. This is the core of the fix: the
+    # old path pulled the most-recent ~400 rows regardless of the question.
+    date_from, date_to = _extract_date_window(question)
+    window_label = f"{date_from} → {date_to}" if date_to else f"{date_from} → today"
+    blocks.append(
+        f"SCOPE & WINDOW: the invoice data below is the COMPLETE history for the "
+        f"focused client(s) — filtered FIRST by the client's SAP sold-to / "
+        f"bill-to, then by invoice date {window_label}. There is NO recent-row "
+        f"cap: every invoice line in this window is included. Answer aggregate "
+        f"questions (totals, which material codes were billed, invoice counts, "
+        f"date ranges) from this COMPLETE set across ALL years in the window — "
+        f"never assume the data is limited to the most recent invoices or the "
+        f"current year."
+    )
+
     all_invoice_frames = []
     any_resolved = False
 
     for client in client_names:
-        # 4) Engagement bridge.
+        # 4) SCOPE bridge — client name → SOLD-TO (preferred) / bill-to
+        # (fallback) via resolve_scope. This is the SAME resolution the Material
+        # Validation agent uses, so the chat and validation can't disagree on
+        # which customer a client maps to. (Previously this used resolve_billto
+        # alone, which missed sold-to-only billing.)
         try:
-            matches = resolve_billto(client, cfg)
+            scope = resolve_scope(client, cfg, schema_info)
         except Exception as e:
             blocks.append(
-                f"\n— {client}: {_ERR_BANNER} engagement-bridge query failed: "
-                f"{e}")
+                f"\n— {client}: {_ERR_BANNER} client-scope query failed: {e}")
             continue
 
-        if not matches:
+        if not scope or not scope.get("values"):
             blocks.append(
-                f"\n— {client}: no SAP bill-to customer fuzzy-matched this "
+                f"\n— {client}: no SAP sold-to / bill-to customer matched this "
                 f"client name (threshold {BILLTO_MATCH_THRESHOLD}). No invoice "
                 "data to show. Tell the user no SAP invoices could be linked "
                 "to this client.")
             continue
 
         any_resolved = True
-        codes = [m["code"] for m in matches]
-        bridge_note = ", ".join(
-            f'{m["name"]} (bill-to {m["code"]}, match {m["score"]}%)'
-            for m in matches[:4])
-        blocks.append(f"\n— {client}\n  Bridged to SAP customer(s): {bridge_note}")
+        blocks.append(
+            f"\n— {client}\n  Scoped to SAP {scope.get('kind', 'customer')} "
+            f"[{scope.get('label', '?')}] on column {scope.get('col')} "
+            f"({len(scope.get('values', []))} value(s)).")
 
-        # 5) Pull invoice lines.
+        # 5) Pull the COMPLETE invoice history in the window for this scope.
         try:
-            inv = fetch_invoice_lines(codes, cfg)
+            inv = fetch_invoice_lines(scope, cfg,
+                                      date_from=date_from, date_to=date_to)
         except Exception as e:
             blocks.append(
                 f"  {_ERR_BANNER} invoice-line query failed: {e}"
                 + _ERR_QUOTE_INSTRUCTION)
             continue
         if inv.empty:
-            blocks.append("  (bill-to resolved but no invoice lines returned "
-                          "for this customer — there may simply be no recent "
-                          "invoices.)")
+            blocks.append(
+                f"  (scope resolved but no invoice lines in the window "
+                f"{window_label} — this client may have no invoices on/after "
+                f"{date_from}. If you expected older invoices, ask again naming "
+                "the specific year.)")
             continue
         all_invoice_frames.append(inv)
 
         n_docs = inv["OTC_SIH_INVOICE_DOCUMENT"].nunique()
-        blocks.append(f"  {len(inv)} invoice line(s) across {n_docs} invoice "
-                      f"document(s) (most recent first, capped at "
-                      f"{MAX_INVOICE_LINES}).")
+        blocks.append(
+            f"  COMPLETE history pulled for {window_label}: {len(inv)} invoice "
+            f"line(s) across {n_docs} invoice document(s) — no recent-window "
+            f"row cap; every line in this date range is included.")
+
+        # Per-year coverage + complete per-code rollup over the FULL dataset, so
+        # aggregate answers reflect every year — not just the rendered sample.
+        blocks.append(_render_history_summary(inv))
 
         # 6) CONTRACT bridge + 7) reconciliation.
         agent_map = _agent_material_map(client)
@@ -1475,10 +1593,10 @@ def build_invoice_context(client_names: list[str], question: str = "",
     # ── 8) DIRECT invoice-number lookup ────────────────────────────────────
     # If the user's question explicitly named one or more invoice document
     # numbers (e.g. "what's the bill amount for invoice 90019079?"), the
-    # bill-to-scoped fetch above can miss them — it only returns the most
-    # recent N invoices, so a 2022 invoice falls off the window. We pull
-    # those documents by their numbers directly, regardless of bill-to,
-    # and append them as a separate clearly-labelled block.
+    # scoped fetch above can still miss them when they fall OUTSIDE the date
+    # window (e.g. a 2022 invoice, below the 2024 floor) or belong to a
+    # different client. We pull those documents by their numbers directly,
+    # regardless of scope or date, and append them as a clearly-labelled block.
     direct_docs = _extract_invoice_numbers(question)
     if direct_docs:
         blocks.append(
@@ -1785,6 +1903,88 @@ def _summarize_material_hits(code: str, df: pd.DataFrame) -> str:
             f"e.g. {'; '.join(examples)}{more}")
 
 
+def _render_history_summary(inv: pd.DataFrame, max_codes: int = 500) -> str:
+    """Compact, COMPLETE rollups over the ENTIRE fetched dataset (the whole
+    date window), so aggregate questions are answerable even though the per-line
+    detail further below is sampled:
+
+      • PER-YEAR coverage — invoices, lines, and net per calendar year. This is
+        the direct antidote to "the bot only sees the current year": it proves,
+        in the prompt, that every year in the window is present and how much was
+        billed in each.
+      • PER-CODE rollup — every distinct material code billed in the window with
+        its line count, invoice count, first/last billed date, and total net.
+        This is the authoritative "what was ever billed" list.
+
+    Both are computed over EVERY row pulled — never a sample. The per-code list
+    is capped at ``max_codes`` (very high; only a pathological client would hit
+    it) with an explicit overflow note."""
+    lines = ["\n  === BILLING HISTORY SUMMARY "
+             "(COMPLETE — entire window, every line counted) ==="]
+    if inv is None or inv.empty:
+        lines.append("  (no invoice lines)")
+        return "\n".join(lines)
+
+    dates = pd.to_datetime(inv.get("OTC_SIH_INVOICE_DATE"), errors="coerce")
+    nets = [_safe_float(v) for v in inv.get("OTC_SIL_NET_AMOUNT", [])]
+    docs = inv.get("OTC_SIH_INVOICE_DOCUMENT").astype(str)
+
+    # ── Per-year coverage ──────────────────────────────────────────────────
+    # Build from positional lists so a non-default frame index can't misalign.
+    by_year = pd.DataFrame({
+        "year": list(dates.dt.year),
+        "net": nets,
+        "doc": list(docs),
+    }).dropna(subset=["year"])
+    lines.append("  Per-year coverage (proves the full multi-year span is "
+                 "loaded, not just the latest year):")
+    if by_year.empty:
+        lines.append("    (invoice dates could not be parsed for a per-year "
+                     "breakdown — the per-code rollup below is still complete)")
+    else:
+        for yr in sorted(by_year["year"].unique()):
+            sub = by_year[by_year["year"] == yr]
+            lines.append(
+                f"    {int(yr)}: {sub['doc'].nunique()} invoice(s), "
+                f"{len(sub)} line(s), net ${sub['net'].sum():,.2f}")
+
+    # ── Per-code rollup over the complete window ───────────────────────────
+    lines.append("  Every distinct material code billed in this window "
+                 "(COMPLETE — line(s) · invoice(s) · first→last · net):")
+    code_rows: list = []
+    codes_series = inv["OTC_SIL_MATERIAL"].astype(str).str.strip()
+    for code, grp in inv.groupby(codes_series, sort=False):
+        if not code or code.lower() == "nan":
+            continue
+        cdts = pd.to_datetime(grp["OTC_SIH_INVOICE_DATE"], errors="coerce").dropna()
+        first = cdts.min().date().isoformat() if not cdts.empty else "?"
+        last = cdts.max().date().isoformat() if not cdts.empty else "?"
+        cnet = sum(_safe_float(v) for v in grp.get("OTC_SIL_NET_AMOUNT", []))
+        ndoc = grp["OTC_SIH_INVOICE_DOCUMENT"].astype(str).nunique()
+        text = ""
+        for t in grp.get("OTC_SIL_MATERIAL_TEXT", []):
+            ts = str(t or "").strip()
+            if ts and ts.lower() != "nan":
+                text = ts[:40]
+                break
+        code_rows.append((cnet, code, text, len(grp), ndoc, first, last))
+
+    if not code_rows:
+        lines.append("    (no material codes on any line)")
+        return "\n".join(lines)
+
+    code_rows.sort(key=lambda r: -r[0])
+    for cnet, code, text, nln, ndoc, first, last in code_rows[:max_codes]:
+        desc = f' "{text}"' if text else ""
+        lines.append(
+            f"    {code}{desc} — {nln} line(s) · {ndoc} invoice(s) · "
+            f"{first}→{last} · net ${cnet:,.2f}")
+    if len(code_rows) > max_codes:
+        lines.append(f"    …(+{len(code_rows) - max_codes} more distinct "
+                     "code(s) — rare; raise SNOWFLAKE_* caps if needed)")
+    return "\n".join(lines)
+
+
 def _render_reconciliation(rec: dict, include_contract_only: bool = True) -> str:
     """Render the MATERIAL CODE RECONCILIATION block — the highest-value part.
     Spells out, per the user's rules, how the LLM should present each case.
@@ -2005,8 +2205,12 @@ def _render_invoice_lines(inv: pd.DataFrame,
         )
         lines.append("      " + _summarize_material_codes(grp))
     if skipped_invoices > 0:
-        lines.append(f"\n  (+{skipped_invoices} more invoice document(s) not "
-                     f"shown — the {len(shown_groups)} most-recent are above)")
+        lines.append(
+            f"\n  (+{skipped_invoices} more invoice document(s) beyond the "
+            f"{len(shown_groups)} most-recent rendered above — their net/codes "
+            "are ALREADY counted in the GRAND TOTAL and the BILLING HISTORY "
+            "SUMMARY (per-year + per-code) earlier in this block. The data is "
+            "complete; only the per-invoice line dump is sampled.)")
     # Single legacy `len(inv) > max_rows` summary, kept as a fallback.
     if total_lines_skipped == 0 and skipped_invoices == 0 and len(inv) > 0:
         lines.append(f"\n  (showing all {len(inv)} line(s))")

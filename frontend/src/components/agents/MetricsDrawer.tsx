@@ -156,13 +156,13 @@ export default function MetricsDrawer({
                       runtime, API calls and the model actually used */}
                   <div className="mt-4 border border-line">
                     <div className="border-b border-line bg-surface-2/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-ink-3">
-                      Per-agent metrics (latest run)
+                      Per-data-cube metrics (latest run)
                     </div>
                     <div className="max-h-72 overflow-auto">
                       <table className="w-full">
                         <thead className="sticky top-0 bg-surface">
                           <tr className="border-b border-line text-left font-mono text-[8.5px] uppercase tracking-wider text-ink-3">
-                            <th className="px-2.5 py-1.5 font-medium">Agent / Model</th>
+                            <th className="px-2.5 py-1.5 font-medium">Data Cube / Model</th>
                             <th className="px-1.5 py-1.5 text-right font-medium">In</th>
                             <th className="px-1.5 py-1.5 text-right font-medium">Out</th>
                             <th className="px-1.5 py-1.5 text-right font-medium">Calls</th>

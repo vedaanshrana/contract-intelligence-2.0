@@ -5,7 +5,7 @@ import type { Role } from '../../types'
 
 const PERSONAS: Record<Role, { name: string; email: string; department: string }> = {
   admin: { name: 'Vedaansh Rana', email: 'vedaansh.rana@fiserv.com', department: 'Platform Administration' },
-  user: { name: 'Rudy Gupta', email: 'rudraksh.gupta@fiserv.com', department: 'Biller' },
+  user: { name: 'Rudraksh Gupta', email: 'rudraksh.gupta@fiserv.com', department: 'Billing Team' },
 }
 
 function Field({
@@ -71,7 +71,7 @@ export default function LoginGateway() {
         {/* header */}
         <div className="border-b border-line px-7 pb-5 pt-7">
           <div className="text-[15px] font-semibold tracking-tight text-ink">
-            CONTRACT INTELLIGENCE
+            BILLING INTELLIGENCE
           </div>
           <div className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink-3">
             AI enabled LLM

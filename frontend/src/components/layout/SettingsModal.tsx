@@ -16,12 +16,12 @@ import Dropdown from '../ui/Dropdown'
 
 const MODEL_ROWS: { key: keyof Settings; name: string; desc: string }[] = [
   { key: 'chat_model', name: 'Chat Engine', desc: 'Conversational answers + source citations' },
-  { key: 'hier_model', name: 'Hierarchy Agent', desc: 'Per-contract metadata + amendment tree' },
+  { key: 'hier_model', name: 'Hierarchy Data Cube', desc: 'Per-contract metadata + amendment tree' },
   { key: 'engagement_model', name: 'Engagement + Product Module', desc: 'Scope, signatories, product hierarchy (vision)' },
-  { key: 'extr_model', name: 'Fee Description Agent', desc: 'Dollar / textual line-item extraction (vision)' },
+  { key: 'extr_model', name: 'Fee Description Data Cube', desc: 'Dollar / textual line-item extraction (vision)' },
   { key: 'match_model', name: 'Material Code Matching', desc: 'Dictionary matcher' },
-  { key: 'cpi_model', name: 'CPI Terms Agent', desc: 'Annual escalation language' },
-  { key: 'scope_model', name: 'Scope Triage', desc: 'Cheap per-agent contract triage' },
+  { key: 'cpi_model', name: 'CPI Terms Data Cube', desc: 'Annual escalation language' },
+  { key: 'scope_model', name: 'Scope Triage', desc: 'Cheap per-data-cube contract triage' },
 ]
 
 function RouterTab() {
@@ -70,7 +70,7 @@ function RouterTab() {
         <table className="w-full">
           <thead className="sticky top-0 z-10 bg-surface-2">
             <tr className="border-b border-line text-left font-mono text-[9px] uppercase tracking-[0.14em] text-ink-3">
-              <th className="px-4 py-2 font-medium">Agent</th>
+              <th className="px-4 py-2 font-medium">Data Cube</th>
               <th className="w-[230px] px-4 py-2 font-medium">Target Model</th>
             </tr>
           </thead>
@@ -250,7 +250,7 @@ function IngestionTab() {
         </div>
       )}
       <p className="text-[11px] leading-relaxed text-ink-3">
-        The Material Code Matching agent uses this dictionary to map each fee line
+        The Material Code Matching Data Cube uses this dictionary to map each fee line
         item to a SAP material code. If no dictionary is set, matching is skipped
         and the chat will say so.
       </p>
@@ -300,7 +300,7 @@ export default function SettingsModal() {
         <div className="flex shrink-0 border-b border-line">
           {(
             [
-              ['router', 'Agent LLM Router', CircuitBoard],
+              ['router', 'Data Cube LLM Router', CircuitBoard],
               ['ingest', 'Dictionary', BookText],
             ] as const
           ).map(([id, label, Icon]) => (

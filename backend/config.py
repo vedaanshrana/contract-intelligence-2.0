@@ -58,6 +58,11 @@ EXTRACTION_API_KEY = (
 # CPI extractor — the notebook's embedded key was revoked, reuse extraction key.
 CPI_API_KEY = os.environ.get("CPI_API_KEY") or EXTRACTION_API_KEY
 CPI_MODEL   = os.environ.get("CPI_MODEL", "gpt-4o-mini")
+# Vision fallback for image-only contracts where OCR is unavailable or fails.
+# When the text/OCR scan yields nothing, the CPI agent renders the page images
+# and reads them directly with this gpt-5.2-class vision model (same logic, but
+# the model sees the pages instead of OCR text).
+CPI_VISION_MODEL = os.environ.get("CPI_VISION_MODEL", "gpt-5.2-2025-12-11")
 
 # Master Contract (vision: signatures + addresses + summary)
 MASTER_CONTRACT_API_KEY = os.environ.get("MASTER_CONTRACT_API_KEY") or EXTRACTION_API_KEY

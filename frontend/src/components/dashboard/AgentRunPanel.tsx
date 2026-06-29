@@ -52,7 +52,7 @@ export default function AgentRunPanel({
     const r = el.getBoundingClientRect()
     setErrPopup({
       display,
-      reason: (reason && reason.trim()) || 'This agent did not complete successfully.',
+      reason: (reason && reason.trim()) || 'This data cube did not complete successfully.',
       x: r.left,
       y: r.bottom,
     })
@@ -135,7 +135,7 @@ export default function AgentRunPanel({
             setReasons((r) => ({
               ...r,
               [key]:
-                'The agent stream ended unexpectedly (backend error or lost connection). Check the backend terminal/logs for the traceback.',
+                'The data cube stream ended unexpectedly (backend error or lost connection). Check the backend terminal/logs for the traceback.',
             }))
             runNext()
           },
@@ -177,7 +177,7 @@ export default function AgentRunPanel({
       <div className="flex items-center justify-between border-b border-line bg-surface-2/50 px-3 py-2">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-3">
-            Run individual agents · {client.client}
+            Run individual data cubes · {client.client}
           </span>
           {busy && runningKey && (
             <span className="font-mono text-[9px] text-primary">
@@ -318,7 +318,7 @@ export default function AgentRunPanel({
                   {errPopup.reason}
                 </p>
                 <p className="mt-2 border-t border-line/60 pt-2 text-[9px] text-ink-3">
-                  Resolve the cause above, then re-run this agent.
+                  Resolve the cause above, then re-run this data cube.
                 </p>
               </div>
             </div>

@@ -76,34 +76,34 @@ _FEEDBACK_LOCK = threading.Lock()
 # ── Agent catalogue ───────────────────────────────────────────────────────────
 # The 9 user-facing agents, in pipeline order. Each maps 1:1 to a backend module.
 FRONTEND_AGENTS: tuple[tuple[str, str], ...] = (
-    ("contract_hierarchy", "Hierarchy Agent"),
-    ("contract_scope",     "Engagement Overview Agent"),
-    ("product_module",     "Product Module Agent"),
-    ("fee_digitization",   "Fee Description Agent"),
-    ("material_match",     "Material Code Matching Agent"),
-    ("material_validation","Material Validation Agent"),
-    ("cpi_terms",          "CPI Terms Agent"),
-    ("termination_clause", "Termination Clause Agent"),
-    ("mnr_template",       "MNR Template Agent"),
+    ("contract_hierarchy", "Hierarchy Data Cube"),
+    ("contract_scope",     "Engagement Overview Data Cube"),
+    ("product_module",     "Product Module Data Cube"),
+    ("fee_digitization",   "Fee Description Data Cube"),
+    ("material_match",     "Material Code Matching Data Cube"),
+    ("material_validation","Invoice validated material data cube"),
+    ("cpi_terms",          "CPI Terms Data Cube"),
+    ("termination_clause", "Termination Clause Data Cube"),
+    ("mnr_template",       "MNR Template Data Cube"),
 )
 
 # The full load pipeline (what the old "Load New Clients" button ran), in order.
 # `internal` agents still run + feed chat context but aren't headline cards.
 # key, display, internal
 PIPELINE: tuple[tuple[str, str, bool], ...] = (
-    ("contract_hierarchy", "Hierarchy Agent",                False),
-    ("contract_scope",     "Engagement Overview Agent",      False),
-    ("product_module",     "Product Module Agent",           False),
-    ("scope_agent",        "Scope Triage",                   True),
-    ("fee_digitization",   "Fee Description Agent",           False),
-    ("material_match",     "Material Code Matching Agent",    False),
-    ("material_validation","Material Validation Agent",       False),
-    ("cpi_terms",          "CPI Terms Agent",                 False),
-    ("term_renewal",       "Term & Renewal",                 True),
-    ("termination_clause", "Termination Clause Agent",        False),
-    ("sla",                "SLA & Credits",                  True),
-    ("volume_tiers",       "Volume Tiers",                    True),
-    ("mnr_template",       "MNR Template Agent",              False),
+    ("contract_hierarchy", "Hierarchy Data Cube",                False),
+    ("contract_scope",     "Engagement Overview Data Cube",      False),
+    ("product_module",     "Product Module Data Cube",           False),
+    ("scope_agent",        "Scope Triage",                       True),
+    ("fee_digitization",   "Fee Description Data Cube",           False),
+    ("material_match",     "Material Code Matching Data Cube",    False),
+    ("material_validation","Invoice validated material data cube",False),
+    ("cpi_terms",          "CPI Terms Data Cube",                 False),
+    ("term_renewal",       "Term & Renewal",                     True),
+    ("termination_clause", "Termination Clause Data Cube",        False),
+    ("sla",                "SLA & Credits",                      True),
+    ("volume_tiers",       "Volume Tiers",                        True),
+    ("mnr_template",       "MNR Template Data Cube",              False),
 )
 
 # Map a frontend/pipeline key → the backend clause-agent module name.
@@ -441,19 +441,19 @@ def run_one_agent(key: str, client: str, core: str,
 def _metric_meta(key: str, s: dict) -> tuple[str, str, str]:
     """(fallback_model, metric_agent_key, metric_display) used by run_metrics."""
     table = {
-        "contract_hierarchy": (s["hier_model"], "hierarchy", "Hierarchy Agent"),
-        "contract_scope":     (s["engagement_model"], "engagement_overview", "Engagement Overview Agent"),
-        "product_module":     (s["engagement_model"], "product_module", "Product Module Agent"),
+        "contract_hierarchy": (s["hier_model"], "hierarchy", "Hierarchy Data Cube"),
+        "contract_scope":     (s["engagement_model"], "engagement_overview", "Engagement Overview Data Cube"),
+        "product_module":     (s["engagement_model"], "product_module", "Product Module Data Cube"),
         "scope_agent":        (s["scope_model"], "scope_agent", "Scope Triage (internal)"),
-        "fee_digitization":   (s["extr_model"], "extraction", "Fee Description Agent"),
-        "material_match":     (s["match_model"], "material_match", "Material Code Matching Agent"),
-        "material_validation":(VALIDATION_MODEL, "material_validation", "Material Validation Agent"),
-        "cpi_terms":          (s["cpi_model"], "cpi", "CPI Terms Agent"),
+        "fee_digitization":   (s["extr_model"], "extraction", "Fee Description Data Cube"),
+        "material_match":     (s["match_model"], "material_match", "Material Code Matching Data Cube"),
+        "material_validation":(VALIDATION_MODEL, "material_validation", "Invoice validated material data cube"),
+        "cpi_terms":          (s["cpi_model"], "cpi", "CPI Terms Data Cube"),
         "term_renewal":       ("", "term_renewal", "Term & Renewal (internal)"),
-        "termination_clause": ("", "termination", "Termination Clause Agent"),
+        "termination_clause": ("", "termination", "Termination Clause Data Cube"),
         "sla":                ("", "sla", "SLA & Credits (internal)"),
         "volume_tiers":       ("", "volume_tiers", "Volume Tiers (internal)"),
-        "mnr_template":       (MNR_MODEL, "mnr_template", "MNR Template Agent"),
+        "mnr_template":       (MNR_MODEL, "mnr_template", "MNR Template Data Cube"),
     }
     return table.get(key, ("", key, key))
 
@@ -699,13 +699,21 @@ def portfolio_kpis(clients: list[str]) -> dict:
 
 
 def client_metrics(client: str) -> dict:
-    """run_metrics.json history + latest-by-agent for one client."""
+    """run_metrics.json history + latest-by-agent for one client.
+
+    Headline totals (tokens, cost, runtime) are summed over the LATEST run per
+    agent — not every record on disk — so they always equal the sum of the
+    per-agent rows the UI shows, and re-running an agent never double-counts.
+    Each agent's cost is its recorded per-model tokens × the actual model's
+    price (see run_metrics.cost_for_run). `runs` still carries the full history
+    for the token-per-run chart."""
     runs = run_metrics.load_runs(client)
     latest = run_metrics.latest_by_agent(client)
-    total_in = sum(r.get("input_tokens", 0) for r in runs)
-    total_out = sum(r.get("output_tokens", 0) for r in runs)
-    total_runtime = sum(r.get("runtime_s", 0) for r in runs)
-    total_cost = sum(run_metrics.cost_for_run(r) for r in runs)
+    latest_runs = list(latest.values())
+    total_in = sum(r.get("input_tokens", 0) for r in latest_runs)
+    total_out = sum(r.get("output_tokens", 0) for r in latest_runs)
+    total_runtime = sum(r.get("runtime_s", 0) for r in latest_runs)
+    total_cost = sum(run_metrics.cost_for_run(r) for r in latest_runs)
     return {
         "client": client,
         "runs": runs,
@@ -715,7 +723,7 @@ def client_metrics(client: str) -> dict:
             "outputTokens": total_out,
             "costUsd": round(total_cost, 4),
             "runtimeS": round(total_runtime, 2),
-            "runCount": len(runs),
+            "runCount": len(latest_runs),
         },
     }
 

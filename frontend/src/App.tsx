@@ -10,7 +10,7 @@ import type { TabId } from './types'
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'agents', label: 'Agents Intelligence', icon: BrainCircuit },
+  { id: 'agents', label: 'Data Cubes Intelligence', icon: BrainCircuit },
   { id: 'chat', label: 'Cognitive Chat', icon: BotMessageSquare },
 ]
 

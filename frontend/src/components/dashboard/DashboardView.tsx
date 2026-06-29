@@ -189,8 +189,8 @@ function OrchRow({
           <button
             onClick={onExpand}
             className="flex h-5 w-5 shrink-0 items-center justify-center border border-line text-ink-3 transition-colors duration-150 hover:border-primary/50 hover:text-primary"
-            aria-label={expanded ? 'Hide agents' : 'Show agents'}
-            title={expanded ? 'Hide individual agents' : 'Run individual agents'}
+            aria-label={expanded ? 'Hide data cubes' : 'Show data cubes'}
+            title={expanded ? 'Hide individual data cubes' : 'Run individual data cubes'}
           >
             {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
           </button>
@@ -208,7 +208,7 @@ function OrchRow({
       <td className="px-4 py-2.5">
         <div className="flex items-center gap-2.5">
           <span className="w-[88px] font-mono text-[10.5px] text-ink-2">
-            {run.agentsDone}/{run.total} Agents
+            {run.agentsDone}/{run.total} Data Cubes
           </span>
           <div className="h-[4px] w-28 bg-surface-3">
             <div

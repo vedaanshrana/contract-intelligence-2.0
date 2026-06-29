@@ -15,9 +15,14 @@ run_full() chains both stages.  Stage 1 is skipped if a matches file already
 exists; Stage 2 is always (re)run from the matches file.
 
 OCR (pytesseract + Tesseract binary) and rapidfuzz are OPTIONAL.  Text-based
-PDFs are handled without them; image-only PDFs are skipped if OCR is absent.
+PDFs are handled without them.  For image-only PDFs where OCR is unavailable or
+produces no usable text ("no OCR determination"), the agent falls back to a
+gpt-5.2 vision model: it renders the page images and reads them directly using
+the same extraction logic (snippet / cpi_effective_date / minimum_fee_increase).
+The fallback model is config.CPI_VISION_MODEL.
 """
 
+import base64
 import io
 import json
 import os
@@ -33,7 +38,7 @@ import pandas as pd
 from fiserv_client import make_client
 from PIL import Image
 
-from config import CPI_API_KEY, CPI_MODEL
+from config import CPI_API_KEY, CPI_MODEL, CPI_VISION_MODEL
 
 _ADAPTER_DIR = Path(__file__).resolve().parent.parent
 _INPUT_DIR   = _ADAPTER_DIR / "Input"
@@ -89,6 +94,35 @@ Return a JSON array of objects, e.g.:
 Here are the snippets (numbered). Provide the JSON array ONLY.
 <<snippets_block>>
 """.strip()
+
+# ── Vision fallback prompts (image-only contracts; no usable OCR text) ────────
+_VISION_SYSTEM_PROMPT = (
+    "You are a contract-reading assistant. You are shown page images of a "
+    "contract (scanned or image-only). Read them carefully — including small "
+    "print, tables, fee schedules, and footnotes — and extract structured info "
+    "about CPI-based price/fee adjustments."
+)
+
+_USER_PROMPT_VISION_CPI = """
+The following images are sequential pages of a contract. Read every page carefully.
+
+Find EVERY passage where pricing or fees are tied to "CPI" or the "Consumer Price Index". Also include any "Annual Adjustment ... whichever is greater/lesser" language and any "increased annually effective" fee language, even if the literal term "CPI" is not used in that passage.
+
+For each relevant passage, provide a JSON object with fields:
+  - "snippet": the passage text, transcribed from the image (keep the relevant CPI sentence(s) and any fees or services related information; include conditions where the annual increase does not apply, if present).
+  - "cpi_effective_date": the CPI/fee-increase effective date mentioned in this passage if present (return in the form you see it, e.g., "January 1, 2020", "1/1/2020", "01_01_2020"). If none, return empty string "".
+  - "minimum_fee_increase": the minimum fee increase percentage or expression mentioned in this passage if present (e.g., "2%", "at least 1.5%", "no less than 2 percent"). If none, return empty string "".
+
+Return a JSON array of objects ONLY, e.g.:
+[
+  {"snippet":"...","cpi_effective_date":"...","minimum_fee_increase":"..."}
+]
+If no CPI-related language appears in these pages, return an empty array [].
+""".strip()
+
+# Vision fallback render/chunk settings.
+_VISION_DPI        = 300   # page render resolution for vision fallback
+_VISION_CHUNK_SIZE = 10    # pages per vision call (keeps prompts under context limits)
 
 _DATE_RE     = re.compile(r'\b(\d{1,2}[_/]\d{1,2}[_/]\d{4}|\d{1,2}\s+[A-Za-z]+\s+\d{4}|[A-Za-z]+\s+\d{1,2},\s*\d{4})\b')
 _PERCENT_RE  = re.compile(r'(\d+(?:\.\d+)?\s*(?:%|percent|percentage|bps|basis points))', re.IGNORECASE)
@@ -279,23 +313,46 @@ def _local_extract_from_snippets(snippets: list) -> list:
     return out
 
 
+def _coerce_snippet_objs(parsed) -> list:
+    """Normalize a parsed JSON list into snippet/date/increase dicts."""
+    out = []
+    for obj in parsed:
+        if isinstance(obj, dict):
+            out.append({
+                "snippet": (obj.get("snippet") or "").strip(),
+                "cpi_effective_date": (obj.get("cpi_effective_date") or "").strip(),
+                "minimum_fee_increase": (obj.get("minimum_fee_increase") or "").strip(),
+            })
+    return out
+
+
+def _parse_snippet_json_array(text: str):
+    """Parse an LLM response into a list of snippet dicts, or None on failure.
+
+    Accepts a bare JSON array or a JSON array embedded in surrounding prose.
+    """
+    if not text:
+        return None
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, list):
+            return _coerce_snippet_objs(parsed)
+    except Exception:
+        m = re.search(r'\[.*\]', text, flags=re.DOTALL)
+        if m:
+            try:
+                return _coerce_snippet_objs(json.loads(m.group(0)))
+            except Exception:
+                pass
+    return None
+
+
 def _call_llm_analyze_snippets(client, snippets: list, model: str,
                                retries: int = 2, wait_secs: int = 2) -> list:
     if not snippets:
         return []
     block = "\n\n".join(f"{i+1}. {s}" for i, s in enumerate(snippets))
     user_prompt = _USER_PROMPT_SNIPPET_ANALYSIS.replace("<<snippets_block>>", block)
-
-    def _coerce(parsed) -> list:
-        out = []
-        for obj in parsed:
-            if isinstance(obj, dict):
-                out.append({
-                    "snippet": obj.get("snippet", "").strip(),
-                    "cpi_effective_date": obj.get("cpi_effective_date", "").strip(),
-                    "minimum_fee_increase": obj.get("minimum_fee_increase", "").strip(),
-                })
-        return out
 
     for attempt in range(retries + 1):
         try:
@@ -309,17 +366,9 @@ def _call_llm_analyze_snippets(client, snippets: list, model: str,
                 temperature=0.0,
             )
             text = resp.choices[0].message.content.strip()
-            try:
-                parsed = json.loads(text)
-                if isinstance(parsed, list):
-                    return _coerce(parsed)
-            except Exception:
-                m = re.search(r'\[.*\]', text, flags=re.DOTALL)
-                if m:
-                    try:
-                        return _coerce(json.loads(m.group(0)))
-                    except Exception:
-                        pass
+            parsed = _parse_snippet_json_array(text)
+            if parsed is not None:
+                return parsed
             return _local_extract_from_snippets(snippets)
         except Exception:
             if attempt < retries:
@@ -327,6 +376,192 @@ def _call_llm_analyze_snippets(client, snippets: list, model: str,
             else:
                 return _local_extract_from_snippets(snippets)
     return []
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# VISION FALLBACK — read image-only contracts directly with gpt-5.2
+# ════════════════════════════════════════════════════════════════════════════
+#
+# Used when a PDF has no embedded text AND OCR is unavailable or produced no
+# usable text ("no OCR determination"). Instead of skipping the contract, we
+# render its pages to images and let a vision model read them — same extraction
+# logic (snippet / cpi_effective_date / minimum_fee_increase), but the model
+# sees the pages rather than OCR text.
+
+
+def _ocr_pages_have_text(pages) -> bool:
+    """True if an OCR result actually contains some text on any page."""
+    return bool(pages) and any(isinstance(t, str) and t.strip() for t in pages)
+
+
+# Lines that appear on scanned / e-signed pages but carry NO contract content:
+# DocuSign envelope stamps, bare page numbers, "certified true copy" banners.
+# A text layer made only of these fools a naive "has text" check — the real
+# contract body (incl. any CPI language) lives in the page images.
+_BOILERPLATE_LINE_RE = re.compile(
+    r'docusign envelope id'
+    r'|^\s*page\s+\d+(\s+of\s+\d+)?\s*$'
+    r'|certified\s+true\s+copy',
+    re.IGNORECASE,
+)
+
+
+def _meaningful_words(text: str) -> int:
+    """Count content words on a page, ignoring e-sign / boilerplate lines."""
+    if not isinstance(text, str) or not text.strip():
+        return 0
+    kept = [ln for ln in text.splitlines() if not _BOILERPLATE_LINE_RE.search(ln)]
+    return len(re.findall(r'[A-Za-z]{2,}', " ".join(kept)))
+
+
+def _is_substantive_text(text_pages: list,
+                         min_words_per_page: float = 12.0,
+                         min_substantive_fraction: float = 0.30) -> bool:
+    """True if the embedded text layer is real contract content rather than just
+    e-signature stamps / page furniture.
+
+    Returns False for image-only PDFs (no text) AND for scanned PDFs whose only
+    text layer is a DocuSign stamp on every page — both must fall through to OCR
+    / the vision fallback.
+    """
+    if not text_pages:
+        return False
+    per_page = [_meaningful_words(t) for t in text_pages]
+    total = sum(per_page)
+    if total == 0:
+        return False
+    avg = total / len(text_pages)
+    substantive_pages = sum(1 for w in per_page if w >= min_words_per_page)
+    frac = substantive_pages / len(text_pages)
+    return avg >= min_words_per_page or frac >= min_substantive_fraction
+
+
+def _is_gpt5_family(model_name: str) -> bool:
+    """gpt-5 / o-series reject temperature != 1 → the parameter must be omitted."""
+    m = (model_name or "").lower()
+    return m.startswith("gpt-5") or m.startswith("o1") or m.startswith("o3")
+
+
+def _render_pdf_to_images(pdf_path: Path, dpi: int = _VISION_DPI) -> list:
+    """Render every page of a PDF to a PIL image. Returns [] on failure."""
+    images: list = []
+    try:
+        doc = fitz.open(str(pdf_path))
+    except Exception:
+        return images
+    for page in doc:
+        try:
+            pix = page.get_pixmap(dpi=dpi)
+            images.append(Image.open(io.BytesIO(pix.tobytes("png"))))
+        except Exception:
+            continue
+    doc.close()
+    return images
+
+
+def _image_to_b64(img) -> str:
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode("utf-8")
+
+
+def _dedupe_snippet_dicts(items: list, threshold: int = 70) -> list:
+    """Dedupe snippet dicts by snippet-text similarity (across vision chunks)."""
+    kept: list = []
+    for it in items:
+        norm = _normalize_snippet_text(it.get("snippet", ""))
+        if not norm:
+            continue
+        if any(_similarity(_normalize_snippet_text(k.get("snippet", "")), norm) >= threshold
+               for k in kept):
+            continue
+        kept.append(it)
+    return kept
+
+
+def _call_vision_on_images(client, images: list, vision_model: str,
+                           retries: int = 2, wait_secs: int = 5) -> list:
+    """Send a chunk of page images to the vision model and parse the result."""
+    if not images:
+        return []
+    content: list = [{"type": "text", "text": _USER_PROMPT_VISION_CPI}]
+    for img in images:
+        content.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/png;base64,{_image_to_b64(img)}"},
+        })
+    messages = [
+        {"role": "system", "content": _VISION_SYSTEM_PROMPT},
+        {"role": "user",   "content": content},
+    ]
+
+    for attempt in range(retries + 1):
+        try:
+            kwargs = {"model": vision_model, "messages": messages}
+            # gpt-5 family rejects temperature != 1; omit it (mirrors call_vision).
+            if not _is_gpt5_family(vision_model):
+                kwargs["temperature"] = 0.0
+            resp = client.chat.completions.create(**kwargs)
+            text = (resp.choices[0].message.content or "").strip()
+            parsed = _parse_snippet_json_array(text)
+            return parsed if parsed is not None else []
+        except Exception:
+            if attempt < retries:
+                time.sleep(wait_secs * (attempt + 1))
+            else:
+                return []
+    return []
+
+
+def _vision_extract_cpi(client, pdf_path: Path, vision_model: str,
+                        log: Callable[[str], None]) -> list:
+    """Vision fallback: render the PDF pages and extract CPI snippets directly.
+
+    Returns a list of {snippet, cpi_effective_date, minimum_fee_increase} dicts
+    (same shape as _call_llm_analyze_snippets), deduped across page chunks.
+    """
+    images = _render_pdf_to_images(pdf_path)
+    if not images:
+        log(f"  ⚠ Vision fallback could not render {pdf_path.name}")
+        return []
+
+    results: list = []
+    for start in range(0, len(images), _VISION_CHUNK_SIZE):
+        chunk = images[start:start + _VISION_CHUNK_SIZE]
+        log(f"  Vision reading {pdf_path.name} pages "
+            f"{start + 1}-{start + len(chunk)} with {vision_model}…")
+        results.extend(_call_vision_on_images(client, chunk, vision_model))
+
+    # Keep only objects that carry some content.
+    results = [r for r in results
+               if r.get("snippet") or r.get("cpi_effective_date") or r.get("minimum_fee_increase")]
+    return _dedupe_snippet_dicts(results, threshold=70)
+
+
+def _build_vision_row(client, p: Path, vision_model: str,
+                      log: Callable[[str], None]) -> dict:
+    """Run the vision fallback on one PDF and shape the result into a matches row
+    (same columns as the text/OCR path; OCR column tagged 'Vision')."""
+    v_out = _vision_extract_cpi(client, p, vision_model, log)
+    combined = " ||| ".join(i.get("snippet", "") for i in v_out if i.get("snippet", ""))
+    cpi_dates = _unique_preserve_order(
+        [i.get("cpi_effective_date", "").strip() for i in v_out if i.get("cpi_effective_date", "").strip()])
+    min_incs = _unique_preserve_order(
+        [i.get("minimum_fee_increase", "").strip() for i in v_out if i.get("minimum_fee_increase", "").strip()])
+    if v_out:
+        log(f"  Vision model found {len(v_out)} CPI passage(s) in {p.name}")
+    else:
+        log(f"  Vision model found no CPI language in {p.name}")
+    return {
+        "Filename": p.name,
+        "Contract Type": _detect_contract_type_from_filename(p.name),
+        "Contract Effective Date": _parse_contract_effective_date_from_filename(p.name),
+        "CPI Snippets (LLM)": combined,
+        "Fee Increase Effective Date(s)": ", ".join(cpi_dates),
+        "Minimum Fee Increase(s)": ", ".join(min_incs),
+        "OCR": "Vision",
+        "Page Number": "",
+    }
 
 
 def _parse_contract_effective_date_from_filename(name: str) -> str:
@@ -345,7 +580,8 @@ def _detect_contract_type_from_filename(name: str) -> str:
 
 def _scan_pdfs_in_folder(folder: Path, client, model: str,
                          log: Callable[[str], None],
-                         contracts: Optional[list] = None) -> list:
+                         contracts: Optional[list] = None,
+                         vision_model: str = "") -> list:
     rows: list = []
     term_norm = _normalize_for_match(_SEARCH_TERM)
 
@@ -368,48 +604,54 @@ def _scan_pdfs_in_folder(folder: Path, client, model: str,
             log(f"  ⚠ Could not open {p.name}: {e}")
             continue
 
-        # Build text pages (OCR only if no embedded text)
-        has_text   = False
-        text_pages = []
-        for page in doc:
-            t = page.get_text("text")
-            text_pages.append(t)
-            if t.strip():
-                has_text = True
+        # Build embedded text pages.
+        text_pages = [page.get_text("text") for page in doc]
+
+        # A text layer that is only e-signature stamps / page furniture
+        # (e.g. "DocuSign Envelope ID: …" on every page of a scanned contract)
+        # is NOT a real text layer — the body lives in the page images. Treat
+        # such PDFs, and truly image-only PDFs, as "scanned" so OCR / the vision
+        # fallback can run instead of silently finding nothing.
+        substantive = _is_substantive_text(text_pages)
+        is_scanned  = not substantive
 
         ocr_text_pages = None
         ocr_used = False
-        if has_text:
+        if substantive:
             _TEXT_PAGE_CACHE[p.name] = text_pages
-        else:
-            if _HAS_OCR:
-                log(f"  OCR triggered for {p.name}")
-                ocr_text_pages = _ocr_pdf_to_text_pages(p)
-                _OCR_TEXT_CACHE[p.name] = ocr_text_pages
+        elif _HAS_OCR:
+            log(f"  {p.name}: no substantive text layer — running OCR")
+            ocr_text_pages = _ocr_pdf_to_text_pages(p)
+            _OCR_TEXT_CACHE[p.name] = ocr_text_pages
+            if _ocr_pages_have_text(ocr_text_pages):
                 ocr_used = True
             else:
-                log(f"  ⚠ {p.name} is image-only and OCR is unavailable — skipping text scan")
+                ocr_text_pages = None   # OCR produced nothing usable → vision
 
         # ── Main search: CPI ──
+        # Only token-scan when we have usable text (substantive embedded text or
+        # successful OCR). A scanned PDF with no usable text falls through to the
+        # vision fallback below.
         found_any        = False
         first_match_page = None
         snippets_for_llm = []
-        for page_no in range(len(doc)):
-            page = doc[page_no]
-            if ocr_text_pages is not None:
-                raw = ocr_text_pages[page_no] if page_no < len(ocr_text_pages) else ""
-                page_tokens = [{"text": w, "norm": _normalize_for_match(w)} for w in raw.split()]
-            else:
-                page_tokens = _tokenize_page_words(page)
+        if substantive or ocr_text_pages is not None:
+            for page_no in range(len(doc)):
+                page = doc[page_no]
+                if ocr_text_pages is not None:
+                    raw = ocr_text_pages[page_no] if page_no < len(ocr_text_pages) else ""
+                    page_tokens = [{"text": w, "norm": _normalize_for_match(w)} for w in raw.split()]
+                else:
+                    page_tokens = _tokenize_page_words(page)
 
-            matches = _find_exact_term_locations(term_norm, page_tokens)
-            if matches and first_match_page is None:
-                first_match_page = page_no + 1
-            for mi in matches:
-                found_any = True
-                snippets_for_llm.append(
-                    f"(File: {p.name} - Page {page_no+1}) {_make_snippet(page_tokens, mi)}"
-                )
+                matches = _find_exact_term_locations(term_norm, page_tokens)
+                if matches and first_match_page is None:
+                    first_match_page = page_no + 1
+                for mi in matches:
+                    found_any = True
+                    snippets_for_llm.append(
+                        f"(File: {p.name} - Page {page_no+1}) {_make_snippet(page_tokens, mi)}"
+                    )
         doc.close()
 
         # CASE 1 — CPI found
@@ -468,17 +710,28 @@ def _scan_pdfs_in_folder(folder: Path, client, model: str,
                 "OCR": "Yes" if ocr_used else "No",
                 "Page Number": fb_page,
             })
-        else:
-            rows.append({
-                "Filename": p.name,
-                "Contract Type": _detect_contract_type_from_filename(p.name),
-                "Contract Effective Date": _parse_contract_effective_date_from_filename(p.name),
-                "CPI Snippets (LLM)": "",
-                "Fee Increase Effective Date(s)": "",
-                "Minimum Fee Increase(s)": "",
-                "OCR": "Yes" if ocr_used else "No",
-                "Page Number": "",
-            })
+            continue
+
+        # CASE 3 — vision fallback. The text/OCR scan determined nothing AND
+        # the PDF is scanned/image-only (incl. e-signed scans whose only text
+        # layer is a DocuSign stamp). Render the page images and read them with
+        # the vision model — "no OCR determination" no longer means we give up.
+        if is_scanned:
+            log(f"  {p.name}: text/OCR found no CPI on a scanned PDF — using vision model")
+            rows.append(_build_vision_row(client, p, vision_model or CPI_VISION_MODEL, log))
+            continue
+
+        # CASE 4 — substantive text PDF with genuinely no CPI language.
+        rows.append({
+            "Filename": p.name,
+            "Contract Type": _detect_contract_type_from_filename(p.name),
+            "Contract Effective Date": _parse_contract_effective_date_from_filename(p.name),
+            "CPI Snippets (LLM)": "",
+            "Fee Increase Effective Date(s)": "",
+            "Minimum Fee Increase(s)": "",
+            "OCR": "Yes" if ocr_used else "No",
+            "Page Number": "",
+        })
     return rows
 
 
@@ -489,12 +742,15 @@ def extract(
     progress_callback: Optional[Callable[[str], None]] = None,
     contracts: Optional[list] = None,
     core: str = "",
+    vision_model: str = "",
 ) -> dict:
     """
     Stage 1 — scan the client's PDFs and write <ClientName> CPI_matches.xlsx.
 
-    contracts: optional allowlist of PDF filenames (from the scope agent).
-               When None, every Master/Amendment/Services PDF is scanned.
+    contracts:    optional allowlist of PDF filenames (from the scope agent).
+                  When None, every Master/Amendment/Services PDF is scanned.
+    vision_model: gpt-5.2-class model used as the fallback for image-only PDFs
+                  where OCR is unavailable or fails. Defaults to CPI_VISION_MODEL.
 
     Returns {status, client, rows, output}.
     """
@@ -509,7 +765,9 @@ def extract(
     client = make_client(api_key or CPI_API_KEY)
 
     log(f"Scanning PDFs for CPI language in {client_name}…")
-    rows = _scan_pdfs_in_folder(folder, client, model or CPI_MODEL, log, contracts=contracts)
+    rows = _scan_pdfs_in_folder(folder, client, model or CPI_MODEL, log,
+                                contracts=contracts,
+                                vision_model=vision_model or CPI_VISION_MODEL)
 
     cols = ["Filename", "Contract Type", "Contract Effective Date", "CPI Snippets (LLM)",
             "Fee Increase Effective Date(s)", "Minimum Fee Increase(s)", "OCR", "Page Number"]
@@ -685,19 +943,31 @@ def run_full(
     force_extract: bool = False,
     contracts: Optional[list] = None,
     core: str = "",
+    vision_model: str = "",
 ) -> dict:
     """
     Run both stages: extract CPI matches from PDFs (Stage 1) then format (Stage 2).
     If a matches file already exists and force_extract is False, Stage 1 is skipped.
 
-    contracts: optional allowlist of PDF filenames (from the scope agent).
+    contracts:    optional allowlist of PDF filenames (from the scope agent).
+    vision_model: gpt-5.2-class fallback model for image-only PDFs where OCR is
+                  unavailable or fails. Defaults to CPI_VISION_MODEL.
+
+    A matches file that found NO CPI and never tried the vision fallback is
+    treated as stale and re-extracted, so previously-failed clients pick up the
+    vision capability automatically (it self-stabilizes once vision has run).
     """
     log = progress_callback or (lambda msg: None)
 
     matches = find_cpi_input(client_name)
-    if matches is None or force_extract:
+    stale = matches is not None and not force_extract and _matches_is_stale(matches)
+    if matches is None or force_extract or stale:
+        if stale:
+            log("Existing CPI matches found no CPI and predate the vision "
+                "fallback — re-extracting with the vision model…")
         ext = extract(client_name, api_key=api_key, model=model,
-                      progress_callback=progress_callback, contracts=contracts, core=core)
+                      progress_callback=progress_callback, contracts=contracts,
+                      core=core, vision_model=vision_model)
         if ext.get("status") != "complete":
             return ext
         matches = Path(ext["output"])
@@ -711,6 +981,30 @@ def run_full(
 def is_processed(client_name: str) -> bool:
     p = _OUTPUT_DIR / client_name / "cpi_output.xlsx"
     return p.exists() and p.stat().st_size > 1_000
+
+
+def _matches_is_stale(matches_path: Path) -> bool:
+    """True if a matches file is worth re-extracting: it found NO CPI language
+    for any contract AND the vision fallback was never tried (OCR != 'Vision').
+
+    Once vision has run, rows carry OCR == 'Vision' (even when it legitimately
+    finds nothing), so this returns False and the result is reused — no loop.
+    """
+    try:
+        df = pd.read_excel(str(matches_path))
+    except Exception:
+        return False
+    if df.empty:
+        return True
+    snip = df.get("CPI Snippets (LLM)")
+    if snip is not None:
+        s = snip.astype(str).str.strip()
+        any_cpi = ((s != "") & (s.str.lower() != "nan")).any()
+    else:
+        any_cpi = False
+    ocr = df.get("OCR")
+    vision_tried = ocr is not None and ocr.astype(str).str.strip().str.lower().eq("vision").any()
+    return (not any_cpi) and (not vision_tried)
 
 
 def find_cpi_input(client_name: str) -> Optional[Path]:

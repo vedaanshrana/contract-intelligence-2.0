@@ -26,8 +26,8 @@ function DataGrid({ table, query }: { table: OutputTable; query: string }) {
   if (!table.exists) {
     return (
       <div className="flex h-[300px] items-center justify-center border-b border-line text-center text-[11px] text-ink-3">
-        Not run yet — run this agent from the Dashboard orchestrator or the agent
-        controls.
+        Not run yet — run this data cube from the Dashboard orchestrator or the
+        data cube controls.
       </div>
     )
   }
@@ -41,7 +41,7 @@ function DataGrid({ table, query }: { table: OutputTable; query: string }) {
   if (table.rows.length === 0) {
     return (
       <div className="flex h-[300px] items-center justify-center border-b border-line text-center text-[11px] text-ink-3">
-        Agent ran but produced no rows.
+        Data cube ran but produced no rows.
       </div>
     )
   }
@@ -110,7 +110,7 @@ function HierarchyHtml({
   if (!exists) {
     return (
       <div className="flex h-[320px] items-center justify-center bg-bg/40 px-6 text-center text-[11px] text-ink-3">
-        Run the Hierarchy agent to generate the interactive contract graph.
+        Run the Hierarchy Data Cube to generate the interactive contract graph.
       </div>
     )
   }
@@ -179,7 +179,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
                   : 'bg-surface-2 text-ink-3'
             }`}
           >
-            {client.agentsDone}/{client.agentsTotal} agents
+            {client.agentsDone}/{client.agentsTotal} data cubes
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -247,7 +247,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
       {/* per-agent metrics for the currently selected agent tab */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-line px-4 py-1.5 font-mono text-[10px]">
         <span className="uppercase tracking-wider text-ink-2">
-          {(agentMeta?.display ?? 'Agent').replace(' Agent', '')}
+          {(agentMeta?.display ?? 'Data Cube').replace(' Data Cube', '')}
         </span>
         {agentRun ? (
           <>
@@ -275,7 +275,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
         ) : (
           <>
             <span className="text-line-strong">|</span>
-            <span className="text-ink-3">No run recorded for this agent yet</span>
+            <span className="text-ink-3">No run recorded for this data cube yet</span>
           </>
         )}
       </div>
@@ -295,7 +295,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
               title={a.blurb}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${done ? 'bg-ok' : 'bg-line-strong'}`} />
-              {a.display.replace(' Agent', '')}
+              {a.display.replace(' Data Cube', '')}
             </button>
           )
         })}

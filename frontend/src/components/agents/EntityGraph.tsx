@@ -101,7 +101,7 @@ export default function EntityGraph({ rows }: { rows: Row[] }) {
   if (nodes.length === 0) {
     return (
       <div className="flex h-full items-center justify-center bg-bg/40 text-center text-[11px] text-ink-3">
-        Run the Hierarchy agent to see the contract relationship graph.
+        Run the Hierarchy Data Cube to see the contract relationship graph.
       </div>
     )
   }
