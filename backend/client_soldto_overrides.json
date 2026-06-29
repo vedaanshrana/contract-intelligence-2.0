@@ -1,0 +1,52 @@
+{
+  "_README": [
+    "Deterministic client -> SAP SOLD-TO overrides for the chatbot's invoice lookup.",
+    "When a focused client matches one of the 'aliases' below, the invoice fetch is",
+    "scoped DIRECTLY to the listed sold-to number(s) and the fuzzy name->customer",
+    "matching is skipped entirely. Use this for clients whose folder name diverges",
+    "from their SAP name (e.g. folder 'YNB' vs SAP 'YUKON NATIONAL BANK', or 'ZELLCO",
+    "FEDERAL CREDIT UNION' vs SAP 'Zellco FCU') where fuzzy matching misses.",
+    "",
+    "Matching: an alias matches if its normalized form (lowercase, alphanumeric only)",
+    "equals the focused client's normalized name, OR is contained in it (>=4 chars).",
+    "So 'Farm Credit of Southern Colorado' matches the folder 'Farm Credit Of Southern",
+    "Colorado 233209'. Add the exact Input/ folder name as an alias to be certain.",
+    "",
+    "sold-to NUMBERS are authoritative (they don't change); names are just aliases.",
+    "Edit this file freely — it is reloaded automatically when its timestamp changes."
+  ],
+  "overrides": [
+    {
+      "label": "Arcade Credit Union (sold-to 3007634)",
+      "soldto": ["3007634"],
+      "aliases": ["ARCADE CREDIT UNION", "Arcade Credit Union", "Arcade"]
+    },
+    {
+      "label": "Zellco FCU (sold-to 3000764)",
+      "soldto": ["3000764"],
+      "aliases": ["ZELLCO FEDERAL CREDIT UNION", "Zellco Federal Credit Union", "Zellco FCU", "Zellco"]
+    },
+    {
+      "label": "Educational & Governmental EFCU (sold-to 3006895)",
+      "soldto": ["3006895"],
+      "aliases": [
+        "Educational & Governmental EFCU", "EDUCATIONAL & GOVERNMENTAL EFCU",
+        "EDUCATIONAL FCU", "Educational FCU",
+        "EDU_DHIVYA_DEMO", "EDU_TEST_FINAL"
+      ]
+    },
+    {
+      "label": "Farm Credit of Southern Colorado (sold-to 3037244)",
+      "soldto": ["3037244"],
+      "aliases": [
+        "Farm Credit Of Southern Colorado 233209",
+        "Farm Credit of Southern Colorado", "FARM CREDIT OF SOUTHERN COLORADO"
+      ]
+    },
+    {
+      "label": "Yukon National Bank / YNB (sold-to 3006953)",
+      "soldto": ["3006953"],
+      "aliases": ["YNB", "Yukon National Bank", "YUKON NATIONAL BANK"]
+    }
+  ]
+}

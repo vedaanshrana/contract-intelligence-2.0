@@ -57,6 +57,7 @@ if unset, the first ``[section]`` in the file.  Expected keys per section:
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import threading
@@ -762,12 +763,70 @@ def _score_name(client_name: str, stored_name: str) -> float:
     return score
 
 
+# ── Deterministic client → sold-to overrides (client_soldto_overrides.json) ──
+# Fuzzy name matching misses whenever the Input/ folder name diverges from the
+# SAP sold-to/bill-to NAME (folder "YNB" vs "YUKON NATIONAL BANK"; "ZELLCO
+# FEDERAL CREDIT UNION" vs "Zellco FCU"; a "…233209" suffix on a folder). For
+# clients we KNOW the sold-to number of, an exact override removes all doubt.
+_OVERRIDES_PATH = _REPO_ROOT / "client_soldto_overrides.json"
+_overrides_cache: dict = {"mtime": None, "data": []}
+_overrides_lock = threading.Lock()
+
+
+def _load_soldto_overrides() -> list:
+    """Load and cache the override entries. Reloads when the file's mtime
+    changes so edits take effect without a restart. Returns a list of
+    ``{label, soldto:[...], aliases:[...]}``; [] on any problem (never raises)."""
+    try:
+        env = os.environ.get("SNOWFLAKE_SOLDTO_OVERRIDES")
+        path = Path(env) if env else _OVERRIDES_PATH
+        if not path.exists():
+            return []
+        mt = path.stat().st_mtime
+        with _overrides_lock:
+            if _overrides_cache["mtime"] == mt:
+                return _overrides_cache["data"]
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        entries = raw.get("overrides", []) if isinstance(raw, dict) else raw
+        out = []
+        for e in (entries or []):
+            if not isinstance(e, dict):
+                continue
+            soldto = [str(s).strip() for s in (e.get("soldto") or []) if str(s).strip()]
+            aliases = [str(a) for a in (e.get("aliases") or []) if str(a).strip()]
+            if soldto and aliases:
+                out.append({"label": e.get("label") or aliases[0],
+                            "soldto": soldto, "aliases": aliases})
+        with _overrides_lock:
+            _overrides_cache["mtime"] = mt
+            _overrides_cache["data"] = out
+        return out
+    except Exception:
+        return []
+
+
+def _match_soldto_override(client_name: str) -> Optional[dict]:
+    """Return the override entry whose alias matches `client_name`, else None.
+    Match = normalized-equal OR normalized-alias contained in the normalized
+    client name (alias ≥ 4 chars, to avoid spurious short-substring hits)."""
+    cn = _normalize_strict(client_name)
+    if not cn:
+        return None
+    for e in _load_soldto_overrides():
+        for a in e["aliases"]:
+            an = _normalize_strict(a)
+            if an and (an == cn or (len(an) >= 4 and an in cn)):
+                return e
+    return None
+
+
 def resolve_scope(client_name: str, cfg: dict, info: dict, log=None) -> Optional[dict]:
-    """Resolve a client to a Snowflake filter. Prefers SOLD-TO (one client =
-    one sold-to, several bill-tos); folds in the sold-tos of any matched bill-to
-    AND any sold-to whose NAME matches the client; falls back to bill-to scope
-    when the view has no sold-to column. Returns ``{col, values, kind, label}``
-    or None when nothing resolves.
+    """Resolve a client to a Snowflake filter. A deterministic sold-to OVERRIDE
+    (client_soldto_overrides.json) wins first; otherwise prefers SOLD-TO (one
+    client = one sold-to, several bill-tos), folding in the sold-tos of any
+    matched bill-to AND any sold-to whose NAME matches the client; falls back to
+    bill-to scope when the view has no sold-to column. Returns
+    ``{col, values, kind, label}`` or None when nothing resolves.
 
     NOTE: agents/material_validation._resolve_scope delegates to this — keep the
     return shape and behaviour stable for both callers."""
@@ -776,6 +835,20 @@ def resolve_scope(client_name: str, cfg: dict, info: dict, log=None) -> Optional
     tbl = _qualified_table(cfg)
     conn = _get_connection()
     billto_col = _actual_col("OTC_SIH_BILLTO", info) or "OTC_SIH_BILLTO"
+    soldto_num = _first_present(_SOLDTO_NUM_CANDIDATES, existing)
+
+    # 0) Deterministic sold-to OVERRIDE — checked FIRST, before any fuzzy work.
+    #    Guarantees the right customer for clients whose folder name diverges
+    #    from their SAP name (YNB, Zellco FCU, the …233209 suffix, etc.).
+    ov = _match_soldto_override(client_name)
+    if ov and soldto_num:
+        log(f"  Scope → SOLD-TO OVERRIDE on {soldto_num}: "
+            f"{', '.join(ov['soldto'])} [{ov['label']}].")
+        return {"col": soldto_num, "values": list(ov["soldto"]),
+                "kind": "soldto", "label": ov["label"]}
+    elif ov:
+        log(f"  Override matched [{ov['label']}] but the view exposes no sold-to "
+            "column — falling back to fuzzy resolution.")
 
     # 1) Bill-tos via the proven engagement bridge.
     try:
@@ -785,7 +858,6 @@ def resolve_scope(client_name: str, cfg: dict, info: dict, log=None) -> Optional
         billto_matches = []
     billto_codes = [m["code"] for m in billto_matches if m.get("code")]
 
-    soldto_num = _first_present(_SOLDTO_NUM_CANDIDATES, existing)
     soldto_name = _first_present(_SOLDTO_NAME_CANDIDATES, existing)
 
     if not soldto_num:
