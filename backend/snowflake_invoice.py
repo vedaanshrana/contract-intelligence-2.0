@@ -2062,8 +2062,26 @@ def _render_history_summary(inv: pd.DataFrame, max_codes: int = SUMMARY_MAX_CODE
                 f"{len(sub)} line(s), net ${sub['net'].sum():,.2f}")
 
     # ── Per-code rollup over the complete window ───────────────────────────
-    lines.append("  Every distinct material code billed in this window "
-                 "(COMPLETE — line(s) · invoice(s) · first→last · net):")
+    # 'net' is the SUM of OTC_SIL_NET_AMOUNT across EVERY invoice line for the
+    # code = the actual dollars billed (NOT a unit/per-member rate). We also
+    # pre-compute each code's share of the window's total net, so "what is code
+    # X's share / how much was billed for X" is answered by READING a number —
+    # the model must not derive it from a contract unit price (the CUPR0001
+    # "$1.65 per member × 3 months" mistake) or from a single invoice line.
+    total_net = sum(nets)
+    lines.append(
+        f"  TOTAL NET BILLED in window = ${total_net:,.2f}. This is the "
+        "denominator for ANY 'share / % of billing' question.")
+    lines.append(
+        "  Every distinct material code billed in this window (COMPLETE). For "
+        "each: 'net $' is the SUM of all its invoice-line net amounts = the "
+        "AUTHORITATIVE dollars billed for that code, and '% of total' is its "
+        "share of the window's total net. RULES: to answer how much was billed "
+        "for a code — or its share/percentage — USE THESE pre-computed numbers. "
+        "NEVER compute a code's billed total from the contract's per-unit / "
+        "per-member price, and NEVER multiply one invoice line's net by a number "
+        "of months — the sum already includes every line and every month. "
+        "Format: code \"desc\" — line(s) · invoice(s) · first→last · net $ · % of total:")
     code_rows: list = []
     codes_series = inv["OTC_SIL_MATERIAL"].astype(str).str.strip()
     for code, grp in inv.groupby(codes_series, sort=False):
@@ -2089,9 +2107,10 @@ def _render_history_summary(inv: pd.DataFrame, max_codes: int = SUMMARY_MAX_CODE
     code_rows.sort(key=lambda r: -r[0])
     for cnet, code, text, nln, ndoc, first, last in code_rows[:max_codes]:
         desc = f' "{text}"' if text else ""
+        pct = (cnet / total_net * 100.0) if total_net else 0.0
         lines.append(
             f"    {code}{desc} — {nln} line(s) · {ndoc} invoice(s) · "
-            f"{first}→{last} · net ${cnet:,.2f}")
+            f"{first}→{last} · net ${cnet:,.2f} · {pct:.2f}% of total")
     if len(code_rows) > max_codes:
         lines.append(f"    …(+{len(code_rows) - max_codes} more distinct "
                      "code(s) — rare; raise SNOWFLAKE_* caps if needed)")

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Activity, X } from 'lucide-react'
 import { api } from '../../api'
-import { formatInt } from '../../store'
+import { formatDuration, formatInt } from '../../store'
 import type { MetricsResult, RunRecord } from '../../types'
 
 function StatusDot({ status }: { status: string }) {
@@ -128,7 +128,7 @@ export default function MetricsDrawer({
                   <div className="grid grid-cols-4 gap-2">
                     {[
                       ['Total Runs', formatInt(data.totals.runCount)],
-                      ['Runtime', `${formatInt(data.totals.runtimeS)}s`],
+                      ['Runtime', formatDuration(data.totals.runtimeS)],
                       ['Input Tok', formatInt(data.totals.inputTokens)],
                       ['Output Tok', formatInt(data.totals.outputTokens)],
                     ].map(([k, v]) => (
@@ -187,7 +187,7 @@ export default function MetricsDrawer({
                                 {formatInt(r.calls)}
                               </td>
                               <td className="px-1.5 py-1.5 text-right font-mono text-[10px] tabular-nums text-ink-2">
-                                {r.runtime_s}s
+                                {formatDuration(r.runtime_s)}
                               </td>
                               <td className="px-2.5 py-1.5">
                                 <StatusDot status={r.status} />

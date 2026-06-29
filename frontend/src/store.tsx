@@ -289,6 +289,14 @@ export function formatInt(n: number) {
   return Math.round(n || 0).toLocaleString('en-US')
 }
 
+/** Seconds → "X minutes Y seconds" (e.g. 95 → "1 minutes 35 seconds"). */
+export function formatDuration(seconds: number) {
+  const total = Math.max(0, Math.round(seconds || 0))
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  return `${m} minutes ${s} seconds`
+}
+
 /** USD with cents, e.g. 12.4 → "$12.40". Sub-cent costs keep 4 dp so a tiny
  *  run still reads as non-zero (e.g. "$0.0032") instead of "$0.00". */
 export function formatUsd(n: number) {

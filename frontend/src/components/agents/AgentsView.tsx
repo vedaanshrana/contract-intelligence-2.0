@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Activity, ChevronDown, ChevronRight, Download, ExternalLink, GitBranch, Search } from 'lucide-react'
-import { formatInt, formatUsd, useApp } from '../../store'
+import { formatDuration, formatInt, formatUsd, useApp } from '../../store'
 import { api } from '../../api'
 import { FRONTEND_AGENTS } from '../../constants'
 import type { ClientStatus, MetricsResult, OutputTable } from '../../types'
 import Dropdown from '../ui/Dropdown'
-import EntityGraph from './EntityGraph'
 import MetricsDrawer from './MetricsDrawer'
 
 const CARD_LIMIT = 6
@@ -128,11 +127,10 @@ function HierarchyHtml({
 /* ── Per-client card ─────────────────────────────────────────────── */
 function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: () => void }) {
   const { theme } = useApp()
-  const [agentKey, setAgentKey] = useState('fee_digitization')
+  const [agentKey, setAgentKey] = useState('contract_hierarchy')
   const [table, setTable] = useState<OutputTable | null>(null)
   const [hier, setHier] = useState<OutputTable | null>(null)
   const [showHier, setShowHier] = useState(false)
-  const [hierView, setHierView] = useState<'interactive' | 'quick'>('interactive')
   const [metrics, setMetrics] = useState<MetricsResult | null>(null)
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
@@ -228,7 +226,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
         </span>
         <span className="text-line-strong">|</span>
         <span className="text-ink-3">
-          Total Run Time: <span className="text-primary">{formatInt(totals?.runtimeS ?? 0)}s</span>
+          Total Run Time: <span className="text-primary">{formatDuration(totals?.runtimeS ?? 0)}</span>
         </span>
         <span className="text-line-strong">|</span>
         <span className="text-ink-3">
@@ -261,7 +259,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
             </span>
             <span className="text-line-strong">|</span>
             <span className="text-ink-3">
-              Runtime: <span className="text-primary">{agentRun.runtime_s}s</span>
+              Runtime: <span className="text-primary">{formatDuration(agentRun.runtime_s)}</span>
             </span>
             <span className="text-line-strong">|</span>
             <span className="text-ink-3">
@@ -329,28 +327,12 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
         </button>
         {showHier && (
           <div className="border-t border-line">
-            {/* view switcher: the backend's full interactive Plotly graph, or
-                the lightweight inline SVG */}
+            {/* the backend's full interactive Plotly graph (themed) */}
             <div className="flex items-center justify-between gap-2 border-b border-line bg-surface-2/30 px-3 py-1.5">
-              <div className="flex border border-line p-[2px]">
-                {(
-                  [
-                    ['interactive', 'Interactive'],
-                    ['quick', 'Quick'],
-                  ] as const
-                ).map(([m, label]) => (
-                  <button
-                    key={m}
-                    onClick={() => setHierView(m)}
-                    className={`px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider transition-colors duration-150 ${
-                      hierView === m ? 'bg-primary-dim text-primary' : 'text-ink-3 hover:text-ink-2'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              {hierView === 'interactive' && hier?.exists && (
+              <span className="px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-primary">
+                Interactive
+              </span>
+              {hier?.exists && (
                 <a
                   href={api.hierarchyHtmlUrl(client.client, theme)}
                   target="_blank"
@@ -362,13 +344,7 @@ function ClientCard({ client, onMetrics }: { client: ClientStatus; onMetrics: ()
                 </a>
               )}
             </div>
-            {hierView === 'interactive' ? (
-              <HierarchyHtml client={client.client} theme={theme} exists={!!hier?.exists} />
-            ) : (
-              <div className="h-[300px]">
-                <EntityGraph rows={hier?.rows ?? []} />
-              </div>
-            )}
+            <HierarchyHtml client={client.client} theme={theme} exists={!!hier?.exists} />
           </div>
         )}
       </div>

@@ -43,11 +43,11 @@ function KpiShell({
 }
 
 function LifecycleBar({ lifecycle }: { lifecycle: Portfolio['lifecycle'] }) {
-  const sum = lifecycle.active + lifecycle.pending + lifecycle.expired || 1
+  const nonActive = lifecycle.pending + lifecycle.expired
+  const sum = lifecycle.active + nonActive || 1
   const seg = [
     { key: 'Active', val: lifecycle.active, cls: 'bg-ok' },
-    { key: 'Root / partial', val: lifecycle.pending, cls: 'bg-warn' },
-    { key: 'Superseded', val: lifecycle.expired, cls: 'bg-ink-3' },
+    { key: 'Non active', val: nonActive, cls: 'bg-warn' },
   ]
   return (
     <div>
@@ -56,7 +56,7 @@ function LifecycleBar({ lifecycle }: { lifecycle: Portfolio['lifecycle'] }) {
           <div key={s.key} className={`${s.cls} transition-all duration-150`} style={{ width: `${(s.val / sum) * 100}%` }} />
         ))}
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         {seg.map((s) => (
           <div key={s.key}>
             <div className="flex items-center gap-1.5">
@@ -73,7 +73,6 @@ function LifecycleBar({ lifecycle }: { lifecycle: Portfolio['lifecycle'] }) {
 }
 
 function KpiGrid({ p }: { p: Portfolio }) {
-  const matchPct = (p.matched / (p.matched + p.unmatched || 1)) * 100
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <KpiShell label="Clients in Scope" icon={Building2}>
@@ -98,24 +97,10 @@ function KpiGrid({ p }: { p: Portfolio }) {
       </KpiShell>
 
       <KpiShell label="Material Code Status" icon={ScanBarcode}>
-        <div className="flex items-end gap-5">
-          <div>
-            <div className="font-mono text-[22px] font-semibold leading-none text-ok">{formatInt(p.matched)}</div>
-            <div className="mt-1 text-[10px] text-ink-3">Matched</div>
-          </div>
-          <div>
-            <div className="font-mono text-[22px] font-semibold leading-none text-bad">{formatInt(p.unmatched)}</div>
-            <div className="mt-1 text-[10px] text-ink-3">Unmatched</div>
-          </div>
-          <div className="ml-auto text-right">
-            <div className="font-mono text-[22px] font-semibold leading-none text-ink">{matchPct.toFixed(1)}%</div>
-            <div className="mt-1 text-[10px] text-ink-3">Match rate</div>
-          </div>
+        <div className="font-mono text-[34px] font-semibold leading-none tracking-tight text-ok">
+          {formatInt(p.matched)}
         </div>
-        <div className="mt-3 flex h-2.5 w-full overflow-hidden bg-surface-3">
-          <div className="bg-ok transition-all duration-150" style={{ width: `${matchPct}%` }} />
-          <div className="bg-bad/70 transition-all duration-150" style={{ width: `${100 - matchPct}%` }} />
-        </div>
+        <div className="mt-2 text-[11px] text-ink-3">matched material codes</div>
       </KpiShell>
     </div>
   )
